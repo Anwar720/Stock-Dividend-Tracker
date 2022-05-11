@@ -42,10 +42,12 @@ app.get("/",async(req,res)=>{
     })
     
 })
+// Adding and updating Stock
 app.post("/", async (req,res)=>{
     let database = db
     let insert;
     let result; 
+    // Retrieving Stock Data from Yahoo Finance
     try{
         result  = await yahooFinance.quote(`${req.body.stock_name}`,['summaryDetail','price',"calendarEvents"])
     }catch(err){
@@ -57,16 +59,17 @@ app.post("/", async (req,res)=>{
     let dividendDate = (result.calendarEvents && result.calendarEvents.dividendDate )?result.calendarEvents.dividendDate:'';
     yields = parseFloat((yields).toFixed(3));
     let expected_total = parseFloat((yields * req.body.stock_quantity).toFixed(3));
-    if(req.body.id !== ''){
+    if(req.body.id !== ''){ // Updating stock already existing in DB
         insert = `UPDATE stock SET name = "${(req.body.stock_name.toUpperCase()).toUpperCase()}", price = "$${price}", quantity = "${req.body.stock_quantity}",yield="${yields}",total ="${expected_total}" WHERE id = ${parseInt(req.body.id)}`;
     }else{
-        
+        // Inserting new Stock to db
         insert = `INSERT INTO stock(name,price,quantity,yield,total,dividendDate) VALUES ("${(req.body.stock_name.toUpperCase()).toUpperCase()}", "$${price}", "${req.body.stock_quantity}","${yields}","${expected_total}","${dividendDate}")`;
     }
     db.run(insert, (err) =>{
         if(err) console.log('statement',insert,'Error is:',err);
         else console.log('successful insert to db');
     });
+
     res.redirect('/');
     }else{
     error = `Stock Ticker:\t ${req.body.stock_name}  not found!`;
@@ -82,7 +85,7 @@ app.post('/delete',(req,res)=>{
     })
 })
 
-// updates all stock infomation
+// updates all stock infomation periodically
 const  update_stock_data = ()=>{
     db.all('SELECT * FROM stock ;', (err,data)=>{
         if(err)  return;
@@ -109,8 +112,8 @@ function alterTable(){
     db.run(sql,(err)=>{
         if(err) console.log('problem altering table');
     });
-
 }
+
 //alterTable();
 setInterval(update_stock_data,1000*60*60);
 app.listen(port,()=> `Running on port ${port}`);
