@@ -25,7 +25,7 @@ const USER_STOCK = `CREATE TABLE IF NOT EXISTS user_stocks(
                     )`;
 console.log('the updated version');
 
-const db = new Pool({
+const db = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
     ssl:{
     rejectUnauthorized: false
