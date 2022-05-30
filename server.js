@@ -11,7 +11,7 @@ import {verifyJwt,checkAuthenitcated,checkNotAuthenticated} from './middleware/v
 import {Validation,validationResult} from './middleware/validation.middleware.js';
 import {checkStockInDb} from './middleware/checkDB.middleware.js'
 const app = express();
-const port = 3000;
+const port = process.env.PORT || 3000;
 
 process.on('uncaughtException', (error)  => {
     console.log('🔥🚀Alert! ERROR : ',  error);
