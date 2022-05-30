@@ -23,21 +23,22 @@ const USER_STOCK = `CREATE TABLE IF NOT EXISTS user_stocks(
                     FOREIGN KEY(user_id)
                     REFERENCES users(user_id) 
                     )`;
-
-// const db = new pg.Pool ({
-//     user: process.env.USERNAME,
-//     host: process.env.HOST,
-//     database: process.env.DATABASE,
-//     password: process.env.PASSWORD,
-//     port: process.env.PORT,
-//     dialect: "postgres",
-//     ssl: { rejectUnauthorized: false }
-    
-// });
-const connectionString = process.env.DATABASE_URL;
+console.log('the updated version');
 const db = new pg.Pool ({
-    connectionString,
+    user: process.env.USERNAME,
+    host: process.env.HOST,
+    database: process.env.DATABASE,
+    password: process.env.PASSWORD,
+    port: process.env.PORT,
+    dialect: "postgres",
+    ssl: { rejectUnauthorized: false }
+    
 });
+
+// const connectionString = process.env.DATABASE_URL;
+// const db = new pg.Pool ({
+//     connectionString,
+// });
 db.connect((err,res)=>{
     if(res) console.log('Successful connection to db');
     if (err) console.log('Unable to connect to db',err);
