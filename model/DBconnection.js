@@ -26,7 +26,7 @@ const USER_STOCK = `CREATE TABLE IF NOT EXISTS user_stocks(
 console.log('the updated version');
 const db = new pg.Pool ({
     user: process.env.USERNAME,
-    host: process.env.HOST,
+    host: "ec2-34-231-63-30.compute-1.amazonaws.com",
     database: process.env.DATABASE,
     password: process.env.PASSWORD,
     port: process.env.PORT,
@@ -34,6 +34,16 @@ const db = new pg.Pool ({
     ssl: { rejectUnauthorized: false }
     
 });
+// const db = new pg.Pool ({
+//     user: process.env.USERNAME,
+//     host: process.env.HOST,
+//     database: process.env.DATABASE,
+//     password: process.env.PASSWORD,
+//     port: process.env.PORT,
+//     dialect: "postgres",
+//     ssl: { rejectUnauthorized: false }
+    
+// });
 
 // const connectionString = process.env.DATABASE_URL;
 // const db = new pg.Pool ({
