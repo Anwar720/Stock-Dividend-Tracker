@@ -1,27 +1,4 @@
 import yahooFinance from "yahoo-finance";
-// updates all stock infomation periodically
-
-// const  update_stock_data = (db)=>{
-//     db.query('SELECT * FROM stock ;', (err,data)=>{
-//         if(err)  return;
-//         data.rows.forEach((async item=>{
-//             // let result  = await yahooFinance.quote(item.name,['summaryDetail'],(err)=> {if(err) console.log("yahooFinance update error:",err)})
-//             let result  = await yahooFinance.quote(item.name,['summaryDetail','price',"calendarEvents"],(err)=> {if(err) console.log("yahooFinance update error:",err)})
-//             let yields = result.summaryDetail.dividendRate || result.summaryDetail.trailingAnnualDividendRate ||result.summaryDetail.yield *result.summaryDetail.open || 0;
-//             let price = result.price.regularMarketPrice || result.summaryDetail.open;
-//             let dividendDate = (result.calendarEvents && result.calendarEvents.dividendDate )?result.calendarEvents.dividendDate:'';
-//             yields = parseFloat((yields).toFixed(3));
-//             let expected_total = parseFloat((yields * item.quantity).toFixed(3));
-//             let insert = `UPDATE stock SET price = ${price}, yield=${yields},total =${expected_total},dividendDate='${dividendDate}' WHERE id = ${parseInt(item.id)}`;
-//             db.query(insert, (err) =>{
-//                 if(err) console.log('Updating : ',insert,'Error is:',err);
-//                 else console.log('successful update to db:',item.name);
-//             });
-//         }
-//             ));
-//     })
-//     return;
-// }
 
 const hourly_Update_Stock_Price = async (db)=>{
     const date = new Date();

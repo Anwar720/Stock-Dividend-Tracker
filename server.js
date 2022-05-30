@@ -3,6 +3,7 @@ import express from 'express';
 import bodyparser from 'body-parser';
 import yahooFinance from 'yahoo-finance';
 import cookieParser from 'cookie-parser';
+console.log('before connecting to db');
 import {db} from './model/DBconnection.js';
 import { hourly_Update_Stock_Price,monthly_update_dividend_data } from './middleware/update_data.js';
 import { register_user,login_user } from './middleware/authentication.middleware.js';

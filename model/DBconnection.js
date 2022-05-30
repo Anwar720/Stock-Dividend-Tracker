@@ -24,15 +24,12 @@ const USER_STOCK = `CREATE TABLE IF NOT EXISTS user_stocks(
                     REFERENCES users(user_id) 
                     )`;
 console.log('the updated version');
-const db = new pg.Pool ({
-    user: "xappnfrdkpmfhl",
-    host: "ec2-34-231-63-30.compute-1.amazonaws.com",
-    database: "dem06hjiakd17s",
-    password: "369592892f7d0354e4fd9baf61b83f271cee6d3f8d5ffe692366b8e2c2f08f00",
-    port: 5432,
-    dialect: "postgres",
-    ssl: { rejectUnauthorized: false }
-    
+
+const db = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    ssl: {
+    rejectUnauthorized: false
+    }
 });
 // const db = new pg.Pool ({
 //     user: process.env.USERNAME,
@@ -49,7 +46,7 @@ const db = new pg.Pool ({
 // const db = new pg.Pool ({
 //     connectionString,
 // });
-db.connect((err,res)=>{
+await db.connect((err,res)=>{
     if(res) console.log('Successful connection to db');
     if (err) console.log('Unable to connect to db',err);
 });
