@@ -1,0 +1,417 @@
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300&family=Nunito&family=Nunito+Sans&display=swap');
+*{
+    padding:0;
+    margin:0;
+    box-sizing: border-box;
+}
+
+body{
+    background:rgb(86, 95, 114);
+    color:white;
+    height:100vh;
+    display:grid;
+    place-items: center;
+    overflow-x: hidden;
+}
+.container{
+    background:rgb(99, 107, 130);
+    width:100vw;
+    padding:1rem;
+    padding-right:1.8rem;
+    text-align: center;
+    box-shadow: 0 0 10px black ;
+    background-image: linear-gradient(rgb(107, 117, 147) ,rgb(145, 117, 181),rgb(107, 117, 147),#675182f3 ,rgb(107, 117, 147) );
+    /* background-image:linear-gradient(rgb(88, 169, 170),rgb(89, 115, 194) ,rgb(41, 59, 105)); */
+
+}
+.top-column{
+    background:rgb(86, 95, 114);
+    height:7rem;
+    /* max-height:; */
+    padding:20px 0;
+    padding-left:5px;
+    display:flex;
+    justify-content: space-around;
+    align-items: center;
+    border-bottom: 2px solid white;
+    box-shadow:0 0 5px black;
+    padding-right:1rem;
+    border-radius:10px;
+}
+
+.inventory{
+    background:rgb(99, 112, 139);
+    padding:20px 0;
+    padding-left:5px;
+    display:flex;
+    justify-content: space-around;
+    align-items: center;
+    border-bottom: 2px solid rgb(247, 247, 248);
+    padding-right:1rem;
+    box-shadow:0 -5px 5px rgb(56, 58, 87),
+                0 -10px 5px rgb(83, 86, 129),
+                5px 0 5px rgb(56, 58, 87),
+                0 -5px 5px black;
+    border-radius:10px;
+    /* max-height:1.8rem; */
+    height:5rem;
+}
+
+.inventory > div,.top-column > div{
+    width:5.4rem;
+    height: 1.8rem;
+    text-align:center;
+    min-inline-size: 10%; 
+    inline-size: 45px;
+}
+
+.add{
+    width: 80%;
+    max-width: 50rem;
+    height:2.57rem;
+    margin:10px 0;
+    background:rgb(131, 144, 184);
+    color:white;
+    font-size:1.2rem;
+    cursor:pointer;
+    border-radius: 10px;
+    text-align: center;
+    padding:2px 7px;
+    box-shadow: 1px 1px 5px inset rgb(204, 216, 223),
+                -1px -1px 3px inset black,
+                3px 3px 14px black;
+}
+.add-data{
+    height:15rem;
+    background-color: rgb(107, 117, 147);
+    padding:10px;
+    text-align: center;
+    display:none;
+    box-shadow: 0 0  8px black;
+    z-index: 999;
+}
+#submit{
+    background:rgb(85, 181, 98);
+}
+.stock-data input{
+    width: 77%;
+    max-width: 50rem;
+    height:2rem;
+    display:flex;
+    flex-direction: column;
+    padding:2px 7px;
+    gap:10px;
+    margin:auto;
+    background:rgb(91, 98, 110);
+    color:white;
+    font-size:1.09rem;
+    text-align:center;
+    align-self: center;
+    margin-top:10px;
+    margin-bottom:1.5rem;
+}
+.sum{
+    margin:15px 10px;
+    text-align: end;
+    font-size: 1.3rem;
+}
+
+#close{
+    color:rgb(245, 106, 106);
+    font-size:1.4rem;
+    position:absolute;
+    left:90%;
+    cursor:pointer;
+}
+i{
+    font-size:10px;
+    color:white;
+    background:transparent;
+}
+.delete {
+    align-items: center;
+    border:none;
+    display:none;
+    background:transparent;
+    transform:scale(2.1);
+    cursor:pointer;
+    flex:0;
+    color:rgb(243, 76, 76); 
+    margin:7px;
+}
+.delete i{
+    color:rgb(239, 22, 22); 
+    font-size: 11px;
+    text-shadow: 0 0 2px rgb(85, 36, 36);
+}
+.edit{
+    align-items: center;
+    border:none;
+    display:none;
+    background:rgba(160, 245, 171, 0.636);
+    background:transparent;
+    margin:5px;
+    transform:scale(2.1);
+    cursor:pointer;
+    flex:0;
+}
+.edit i{
+    color:rgb(123, 242, 139);
+    font-size: 12px;
+    /* text-shadow: 0 0 1px rgb(185, 245, 193); */
+    text-shadow: 0 0 1px rgb(66, 100, 71);
+}
+#piechart_3d {
+    /* width: 9vw;  */
+    height: 500px;
+}
+#piechart_3d > div{
+    width:100%;
+    height:100%;
+    border-radius: 10px;
+}
+.controls{
+    width:4.5rem;
+    max-width:10%;
+    flex-shrink: 7;
+    box-shadow: -3px 3px 5px inset rgb(35, 34, 51),
+                1px 1px 5px inset white;
+                border-radius:5px;
+}
+
+.space{
+    width:3.1rem;
+    flex-shrink: 7;
+}
+.title{
+    background-image: linear-gradient(60deg,rgb(107, 117, 147) ,rgb(123, 134, 170),#59a1a8f3 ,rgb(107, 125, 147),rgb(107, 117, 147));
+    /* height:2.6rem; */
+    color: rgba(80, 244, 176, 0.848);
+    border-radius: 10px;
+    padding:5px;
+    overflow: hidden;
+}
+.coins i{
+    color:gold;
+    font-size: 13px;
+    animation-name:bounce;
+    animation-duration:7s;
+    animation-iteration-count: infinite;
+}
+.money i{
+    color:rgb(41, 213, 41);
+    font-size: 13px;
+    animation-name:bounce;
+    animation-duration:10s;
+    animation-iteration-count: infinite;
+}
+.error{
+    background:#a91530cd;
+    color:rgb(167, 189, 249);
+    margin-bottom:5px;
+    padding:10px 0;
+    border-radius:8px;
+
+}
+.cover{
+    position:fixed;
+    top:0;
+    left:0;
+    height:100vh;
+    width:100vw;
+    place-items:center;
+    background:rgba(139, 129, 159, 0.239);
+    z-index: 999;
+    display:none;
+}
+
+.delete_confirm{
+    background:rgb(87, 90, 116);
+    height:15rem;
+    width:auto;
+    padding:1rem;
+    flex-direction:column;
+    justify-content: space-evenly;
+    border-radius: 10px;
+    display:flex;
+}
+.delete_confirm button{
+    width:8rem;
+    height:4rem;
+    border-radius: 15px;
+    font-size:1.2rem;
+    cursor:pointer;
+    color:white;
+}
+.cancel_delete{
+    background-color: rgba(158, 128, 169, 0.709);
+}
+.verify_delete{
+    background:rgba(244, 43, 43, 0.74);
+}
+#bar_graph{
+    height:30rem;
+    /* padding:10px 0 ; */
+}
+.compound_calculator{
+    padding:25px 10px ;
+    height:14rem;
+    background-color:rgba(99, 112, 139, 0.687) ;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    box-shadow: 0px 2px 10px inset rgb(48, 23, 58);
+}
+.annual_input input[type=number]{
+    border-radius:10px;
+    padding:5px 10px;
+    background:rgb(70, 78, 96);
+    color:white;
+    margin:5px;
+}
+select{
+    padding:2px 5px;
+    border-radius: 3px;
+    background:rgb(70, 78, 96);
+    color:white;
+}
+#calculate{
+    padding:5px;
+    width:50%;
+    max-width: 15rem;
+    margin:auto;
+    margin-top:10px;
+    border-radius: 10px;
+    cursor:pointer;
+    background:rgb(86, 96, 120);
+    color:white;
+}
+#calculate:hover{
+    box-shadow: 0 0 10px rgb(56, 45, 72);
+}
+.top_buttons{
+    display:flex;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+    gap:10px;
+}
+.logout{
+    width:fit-content;
+}
+.logout > input{
+    min-height:2.5rem;
+    min-width:3rem;
+    padding:1vw;
+    background:rgb(238, 78, 78);
+    cursor:pointer;
+    color:white;
+    border-radius:10px;
+}
+.server_error{
+    position:relative;
+    top:1.5em;
+    color:white;
+}
+
+/*------- authentication pages--------- */
+.login,.register{
+    font-family: 'Nunito Sans', sans-serif;
+    background-image:url('/img/rose-petals.svg');
+    background-repeat: none;
+    background-attachment: fixed;
+    background-size: cover;
+    padding:0.8rem;
+    height:32rem;
+    width:26rem;
+    min-height: 25rem;
+        max-width:90vw;
+        border-radius: 20px;
+        text-align:center;
+        overflow: hidden;
+    display:flex;
+    flex-direction:column;
+    justify-content: space-around;
+    align-items: center;
+    position:relative;
+}
+.body h1{
+    height:3rem;
+}
+.body .title{
+    background: transparent;
+    position:absolute;
+    top:3%;
+}
+.title a{
+    color:rgba(80, 244, 176, 0.848);
+    text-decoration: none;
+}
+.title a:hover{
+    color:rgba(80, 201, 183, 0.848);
+
+}
+.login input ,.register input{
+    width:20rem;
+    max-width:87%;
+    height:3rem;
+    padding:5px;
+    border-radius: 10px;
+    font-size: 1rem;
+    box-shadow: 3px 2px 12px rgb(46, 43, 43)
+}
+.login i,.register i{
+    font-size: 1rem;
+    margin:5px;
+}
+.login a{
+    color:rgb(233, 207, 114);
+    height:0.5rem;
+}
+.login .usr-input section{
+    height:65%;
+    margin:0 1rem;
+}
+.body{
+    background-image:linear-gradient(rgb(88, 169, 170),rgb(89, 115, 194) ,rgb(41, 59, 105));
+}
+.body input[type="submit"]{
+    cursor:pointer;
+    background: linear-gradient( rgb(146, 108, 196),rgb(75, 49, 95));
+    color:white;
+}
+.body input[type="submit"]:hover{
+    box-shadow:0 0 8px rgb(138, 150, 205) ;
+}
+
+/* ------------- */
+@keyframes bounce {
+    0%   { transform: scale(1,1)    translateY(0); }
+    10%  { transform: scale(1.1,.9) translateY(0); }
+    30%  { transform: scale(.9,1.1) translateY(-24px); }
+    50%  { transform: scale(1,1)    translateY(0); }
+    100% { transform: scale(1,1)    translateY(0); }
+}
+@media (max-width:520px){
+    body{
+        font-size: 0.9rem;
+    }
+    .inventory,.top-column{
+        font-size:0.7rem;
+    }
+    .login,.register{
+        height:65%;
+    }
+    .title{
+        font-size: 1.5rem;
+    }
+    .sum{
+        font-size:1rem;
+    }
+    .container{
+        padding:0.5rem;
+    }
+    
+}
+
+

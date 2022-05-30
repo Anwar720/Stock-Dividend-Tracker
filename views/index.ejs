@@ -1,14 +1,4 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta http-equiv="X-UA-Compatible" content="IE=edge">
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="chart-line-solid.svg" style="color:white;">
-    <title>Dividend Tracker</title>
-</head>
+<%- include('head') -%>
 <body>
     <div class="container">
         <h1 class="title">
@@ -25,9 +15,15 @@
                 <i class="fas fa-money-bill-wave"></i>
                 <i class="fas fa-money-bill-wave"></i>
             </span>
+    
         </h1>
         <!-- <div id="piechart_3d"></div> -->
-        <input type="submit" id="add" class="add" value='Add Stock'></input>
+
+        <div class="top_buttons">
+            <form action="/user/logout" method="post" class="logout"><input type="submit" class="fa" value="&#xf011;" title="logout"/></form>
+            <input type="submit" id="add" class="add" value='Add Stock'></input>
+            
+        </div>
             <!-- <h3 class="error"> error</h3> -->
             <% if (error != '') { %>
                 <h3 class="error"> <%= error %></h3>
@@ -35,9 +31,7 @@
         <form id="add-data" class="add-data" method="post" action="/">
             <i id="close" class="fas fa-times"></i>
             <span  class="stock-data"><span>Ticker Name:</span><input name="stock_name" id="stock_name" type="text" autocomplete="off" required ></span>    
-            <!-- <span class="stock-data"><span>Average Price:</span><input name="stock_price" id="stock_price"type="text"></span>     -->
             <span class="stock-data"><span>Quantity:</span><input type="text" name="stock_quantity" id="stock_quantity" autocomplete="off" required></span>    
-            <!-- <span  class="stock-data"><span>Yield:</span><input type="text" name="stock_yield" id="stock_yield" ></span>   -->
             <input type="text" id="given_id" style="display:none" name="id" ></input>
             <p id="error"></p>
             <input type="submit" id="submit" class="add">
@@ -60,18 +54,18 @@
             <% for( var i = 0; i < db.length; i++){ %>
                     <div class="inventory">
                         <div class="stock-ticker inv-field"><%= db[i].name %></div>
-                        <div class="stock-price inv-field">$<%=parseFloat(db[i].price.substr(1)).toFixed(2)%></div>
+                        <div class="stock-price inv-field">$<%=db[i].price.toFixed(2)%></div>
                         <div class="stock-quantity inv-field"><%= db[i].quantity %></div>
-                        <div class="stock-quantity inv-field"><%=  (db[i].yield/parseFloat(db[i].price.substring(1))*100).toFixed(2) %>%</div>
-                        <div class="stock-yield inv-field">$<%= db[i].yield || '0.00'%></div>
-                        <div class="stock-yield inv-field"><%=db[i].dividendDate.substr(3,12)%></div>
+                        <div class="stock-quantity inv-field"><%=  (db[i].yield/parseFloat(db[i].price)*100).toFixed(2) %>%</div>
+                        <div class="stock-yield inv-field">$<%= db[i].yield.toFixed(2) || '0.00'%></div>
+                        <div class="stock-yield inv-field"><%=db[i].dividenddate.substr(0,10)%></div>
                         <div class="stock-total inv-field">$<%= db[i].total || '0.00' %></div>
                         <span class="controls">
                         <button data-id='<%= db[i].id %>' title="Delete" class="delete" ><i class="fas fa-trash-alt"></i></button>
                         <button data-id='<%= db[i].id %>'title="Edit" class="edit" ><i class="fas fa-pen-square"></i></button>
                         </span>
-                        <%totalSum += db[i].total %>
-                        <%totalCash += (parseFloat(db[i].price.substring(1))*db[i].quantity)%>
+                        <%totalSum += db[i].total %> 
+                        <%totalCash += (parseFloat(db[i].price)*db[i].quantity)%>
                         
                     </div>
                 <% } %>
@@ -117,7 +111,7 @@
         <div id="bar_graph"></div>
     </div>
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
-    <script src="script.js"></script>
+    <script src="/js/script.js"></script>
 
 
 </body>

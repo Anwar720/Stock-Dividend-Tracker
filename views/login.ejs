@@ -1,0 +1,22 @@
+<%- include('head') -%>
+<body class="body">
+    <%- include('logo') -%>
+    <form action="/user/login" method="post"  class='login'>
+        <h1>Login</h1>
+        
+        <section class="usr-input">
+        <section><i class="fa fa-user"></i></i><input type="email" name="email" id="email"  placeholder="Email" required></section>
+        <section><i class="fa fa-lock"></i><input type="password" name="password" id="password" placeholder="Password" required></section>
+        <span class="error"> 
+        </span>
+        <a href="/register">Create an account</a>
+        </section>
+        <% if (error) { %>
+            <p class="server_error"><%= error %></p>
+            <% } %> 
+            <!-- <p class="server_error">error </p> -->
+        <input type="submit" class="submit" value="submit">
+    </form>
+
+</body>
+</html>
