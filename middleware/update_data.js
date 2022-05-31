@@ -25,6 +25,7 @@ const hourly_Update_Stock_Price = async (db)=>{
         }
     }
 }
+//console.log(new Date().toString().substr(0,10))
 const monthly_update_dividend_data = async (db)=>{
     const stock_names = await db.query(`SELECT name FROM stock`);
         if(stock_names.rows){
@@ -49,4 +50,5 @@ const monthly_update_dividend_data = async (db)=>{
             });
         }
 }
+
 export{hourly_Update_Stock_Price,monthly_update_dividend_data}

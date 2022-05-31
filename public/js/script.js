@@ -3,6 +3,7 @@ let add_data_field = document.getElementById('add-data');
 let stock_list = document.getElementById('stock_list');
 let submit = document.getElementById('submit');
 let x = document.getElementById('close');
+let logout = document.querySelector('.logout');
 addTicker.addEventListener('click', event => {
         showAddMenu();
 });
@@ -10,7 +11,7 @@ addTicker.addEventListener('click', event => {
 // shows the add ticker menu
 const showAddMenu = ()=>{
     addTicker.style.display='none';
-    
+    logout.style.display='none';
     add_data_field.style.display = 'block';
     window.scrollTo({ top: 0, behavior: 'smooth' });
 }
@@ -67,6 +68,8 @@ x.addEventListener('click',()=>{
     clear();
     addTicker.style.display='inline-block';
     add_data_field.style.display = 'none';
+    logout.style.display='block';
+
 })
 
 // editing the stock info
@@ -111,16 +114,14 @@ const change_Edit_Delete_Display = (item,value,padding) =>{
 
 // adjusting bargraph size
 window.addEventListener('resize', function(){
-    let graph = document.getElementById('piechart_3d');
-    // graph.width = window.innerWidth;
-    graph.style.transition = '3s ease-in-out';
-    location.reload();
-    // this.alert('changed size');
+    drawPieGraph();
+    drawBarGraph();
 });
 
 
 // <---------------- Google Charts -------------------->
 // Pie Graph
+const drawPieGraph = ()=>{
 let arr = [document.getElementById('piechart_3d').dataset.arr];
         let pie = [];
         pie.push([ 'Stock', 'Anual Dividend' ]);
@@ -143,8 +144,10 @@ let arr = [document.getElementById('piechart_3d').dataset.arr];
         var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
         chart.draw(data, options);
         }
-
+}
+drawPieGraph();
     //Bar Graph
+    const drawBarGraph = () =>{
     function drawChart2() {
         // Define the chart to be drawn.
         let yield = document.querySelector('.results').firstElementChild.innerText.substr(22);
@@ -180,3 +183,5 @@ let arr = [document.getElementById('piechart_3d').dataset.arr];
     })
     
     google.charts.setOnLoadCallback(drawChart2);
+}
+drawBarGraph();

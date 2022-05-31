@@ -58,7 +58,7 @@
                         <div class="stock-quantity inv-field"><%= db[i].quantity %></div>
                         <div class="stock-quantity inv-field"><%=  (db[i].yield/parseFloat(db[i].price)*100).toFixed(2) %>%</div>
                         <div class="stock-yield inv-field">$<%= db[i].yield.toFixed(2) || '0.00'%></div>
-                        <div class="stock-yield inv-field"><%=db[i].dividenddate.substr(0,10)%></div>
+                        <div class="stock-yield inv-field"><%=db[i].dividenddate.substr(0,10);%></div>
                         <div class="stock-total inv-field">$<%= db[i].total || '0.00' %></div>
                         <span class="controls">
                         <button data-id='<%= db[i].id %>' title="Delete" class="delete" ><i class="fas fa-trash-alt"></i></button>
