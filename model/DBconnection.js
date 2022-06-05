@@ -23,7 +23,6 @@ const USER_STOCK = `CREATE TABLE IF NOT EXISTS user_stocks(
                     FOREIGN KEY(user_id)
                     REFERENCES users(user_id) 
                     )`;
-console.log('the updated version');
 
 const db = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
@@ -31,6 +30,7 @@ const db = new pg.Pool({
     rejectUnauthorized: false
     }
 });
+
 // const db = new pg.Pool ({
 //     user: process.env.USERNAME,
 //     host: process.env.HOST,
@@ -42,11 +42,7 @@ const db = new pg.Pool({
     
 // });
 
-// const connectionString = process.env.DATABASE_URL;
-// const db = new pg.Pool ({
-//     connectionString,
-// });
-await db.connect((err,res)=>{
+db.connect((err,res)=>{
     if(res) console.log('Successful connection to db');
     if (err) console.log('Unable to connect to db',err);
 });
@@ -64,10 +60,16 @@ db.query(USER_STOCK ,(err)=>{
     if(!err)return console.log('successful USER_STOCK Table insert');
     return console.log('error with USER query',err.message);
 });
+// ------******************Additional Table Alters******************--------
+// db.query(`ALTER TABLE stock ADD COLUMN monthly_payer boolean`)
+// db.query(`ALTER TABLE user_stocks ADD COLUMN total_dividends_earned float`)
+// db.query(`ALTER TABLE user_stocks ALTER COLUMN total_dividends_earned SET DEFAULT 0.00`)
+// db.query(`ALTER TABLE user_stocks ADD COLUMN user_dividend_date TEXT`)
+// db.query(`ALTER TABLE stock ADD COLUMN dividend_amount float`)
+//-----------********************************************************---------
 
-// db.query(`INSERT INTO stock (name,price,quantity,yield,total,dividendDate) VALUES ('VOO','140.00',1.0,1.0,10,'june')`,(err)=>{if(err)console.log(err)})
-//db.query("SELECT * FROM stock",(err,res)=>{console.log(res.rows)})
-//db.query("DROP TABLE user_stocks")
-//db.end();
-
+//db.query(`SELECT * FROM user_stocks`,(err,res)=>{console.log(res.rows)})
+// db.query(`SELECT * FROM stock`,(err,res)=>{console.log(res.rows)})
+// db.query(`UPDATE user_stocks SET user_dividend_date = ''`,(err)=>{if(err)console.log(err)})
+// db.query(`DELETE FROM stock WHERE name = 'DCF'`)
 export{db}

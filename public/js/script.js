@@ -152,15 +152,14 @@ drawPieGraph();
         // Define the chart to be drawn.
         let yield = document.querySelector('.results').firstElementChild.innerText.substr(22);
             yield = parseFloat(yield.substr(0,yield.length-1))/100;
-        let total = parseFloat(document.querySelector('.results').lastElementChild.innerText.substr(18))/yield;
+        let total = parseFloat(document.querySelector('.expected_income').innerText.substring(27))/yield;
             total = parseFloat(total.toFixed(3));
         let year = new Date().getFullYear(); 
         let contribution = parseFloat(document.getElementById('contribution').value)*12 || 0;
         let num_of_years = parseInt(document.getElementById('select_years').value);
         let returns = parseFloat(document.getElementById('returns').value)/100 || 7/100;
 
-        console.log('contributions:',total, yield,contribution,num_of_years,returns);
-        //console.log('bar data:', yield,year, total);
+        // console.log('contributions:',total, yield,contribution,num_of_years,returns);
         let yearly_data = [];
         yearly_data.push(['Year', 'Dividend Amount','Account Value']);
 
@@ -170,7 +169,7 @@ drawPieGraph();
             //console.log('total yield is',yield,'contribution is:',contribution,'percent increase:',)
             yearly_data.push([`${year+i+1}`,dividend,total]);
         }
-        console.log('total yield is',yield+returns,contribution);
+        // console.log('total yield is',yield+returns,contribution);
         var data = google.visualization.arrayToDataTable(yearly_data);
         var options = {title: 'Annual Dividend with Reinvestment'}; 
 

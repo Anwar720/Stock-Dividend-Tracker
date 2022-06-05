@@ -1,4 +1,4 @@
-<%- include('head') -%>
+    <%- include('head') -%>
 <body>
     <div class="container">
         <h1 class="title">
@@ -30,9 +30,11 @@
                 <% } %>
         <form id="add-data" class="add-data" method="post" action="/">
             <i id="close" class="fas fa-times"></i>
-            <span  class="stock-data"><span>Ticker Name:</span><input name="stock_name" id="stock_name" type="text" autocomplete="off" required ></span>    
-            <span class="stock-data"><span>Quantity:</span><input type="text" name="stock_quantity" id="stock_quantity" autocomplete="off" required></span>    
-            <input type="text" id="given_id" style="display:none" name="id" ></input>
+            <span  class="stock-data"><span>* Ticker Name:</span><input name="stock_name" id="stock_name" type="text" autocomplete="off" required ></span>    
+            <span class="stock-data"><span>* Quantity:</span><input type="text" name="stock_quantity" id="stock_quantity" autocomplete="off" required></span>    
+            <span><span>Dividend Date: <input class="date" type="date" name="user_dividend_date">
+                <section class="optional">Optional- Index Fund and Mutual Fund Only</section></span></span>    
+            <input  type="text" id="given_id" style="display:none" name="id" ></input>
             <p id="error"></p>
             <input type="submit" id="submit" class="add">
         </form>
@@ -42,39 +44,46 @@
             <div class="quantity">Quantity</div>
             <div class="quantity">Yield Percent</div>
             <div class="yield">Annual<br/> Yield</div>
-            <div class="yield">Recent Payment Date</div>
-            <div class="total">Annual Dividend</div>
+            <div class="yield">Dividends Recieved</div>
+            <div class="total" title="Expected Annual Dividend">Expected Annual Dividend</div>
             <span class="space"></span>
             
         </div>
         <div id="stock_list">
             <%let totalSum = 0; %>
             <%let totalCash = 0; %>
+            <%let dividends_earned = 0; %>
+            
             
             <% for( var i = 0; i < db.length; i++){ %>
                     <div class="inventory">
-                        <div class="stock-ticker inv-field"><%= db[i].name %></div>
-                        <div class="stock-price inv-field">$<%=db[i].price.toFixed(2)%></div>
+                        <div class="stock-ticker inv-field stock_name"><%= db[i].name %></div>
+                        <div class="stock-price inv-field ">$<%=db[i].price.toFixed(2)%></div>
                         <div class="stock-quantity inv-field"><%= db[i].quantity %></div>
                         <div class="stock-quantity inv-field"><%=  (db[i].yield/parseFloat(db[i].price)*100).toFixed(2) %>%</div>
                         <div class="stock-yield inv-field">$<%= db[i].yield.toFixed(2) || '0.00'%></div>
-                        <div class="stock-yield inv-field"><%=db[i].dividenddate.substr(0,10);%></div>
-                        <div class="stock-total inv-field">$<%= db[i].total || '0.00' %></div>
+                        <div class="stock-yield inv-field"><%=db[i].total_dividends_earned.toFixed(2)%></div>
+                        <div class="stock-total inv-field">$<%= db[i].total.toFixed(2) || '0.00' %></div>
                         <span class="controls">
                         <button data-id='<%= db[i].id %>' title="Delete" class="delete" ><i class="fas fa-trash-alt"></i></button>
                         <button data-id='<%= db[i].id %>'title="Edit" class="edit" ><i class="fas fa-pen-square"></i></button>
                         </span>
                         <%totalSum += db[i].total %> 
                         <%totalCash += (parseFloat(db[i].price)*db[i].quantity)%>
+                        <%dividends_earned += (parseFloat(db[i].total_dividends_earned))%>
                         
                     </div>
                 <% } %>
                 <div class="results">
                     <!-- changing this will affect bar graph data -->
-                    <h2 class="sum">Annual Dividend Rate: <%= (totalSum/totalCash*100).toFixed(2) %>%</h2>
-                    <h2 class="sum">Dividend Income:  $<%=parseFloat((totalSum).toFixed(2))%></h2>
+                    <h2 class="sum dividend_rate">Annual Dividend Rate: <%= ((totalSum/totalCash*100).toFixed(2) > 0)?(totalSum/totalCash*100).toFixed(2):0 %>%</h2>
+                    <h2 class="sum expected_income">Expected Dividend Income:  $<%=parseFloat((totalSum).toFixed(2))%></h2>
+                    <h2 class="sum">Dividends Earned:  $<%= dividends_earned.toFixed(2) %></h2>
                 </div>
         </div>
+        
+        <%- include('dividend_calander') -%>
+
         <div class="cover">
             <div class="delete_confirm">
                 <h2>Delete Stock</h2>

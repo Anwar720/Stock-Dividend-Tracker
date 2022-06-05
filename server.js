@@ -3,12 +3,20 @@ import express from 'express';
 import bodyparser from 'body-parser';
 import yahooFinance from 'yahoo-finance';
 import cookieParser from 'cookie-parser';
-console.log('before connecting to db');
 import {db} from './model/DBconnection.js';
-import { hourly_Update_Stock_Price,monthly_update_dividend_data } from './middleware/update_data.js';
-import { register_user,login_user } from './middleware/authentication.middleware.js';
-import {verifyJwt,checkAuthenitcated,checkNotAuthenticated} from './middleware/verification.middleware.js';
-import {Validation,validationResult} from './middleware/validation.middleware.js';
+import {hourly_Update_Stock_Price,
+        monthly_update_dividend_data,
+        update_total_dividends_earned,
+        update_user_entered_dividend_dates,
+        update_user_entered_total_dividends_earned,
+        check_if_monthly_dividend_payer } from './middleware/update_data.js';
+import { register_user,
+        login_user } from './middleware/authentication.middleware.js';
+import {verifyJwt,
+        checkAuthenitcated,
+        checkNotAuthenticated} from './middleware/verification.middleware.js';
+import {Validation,
+        validationResult} from './middleware/validation.middleware.js';
 import {checkStockInDb} from './middleware/checkDB.middleware.js'
 const app = express();
 const port = process.env.PORT || 3000;
@@ -35,20 +43,17 @@ app.get("/register",checkNotAuthenticated ,(req,res)=>{
     res.render("register",{error:registerError});
     registerError=''
 })
-//  db.query(`SELECT *  FROM  user_stocks`,(err,result)=>{console.log(result.rows)})
-//  db.query(`SELECT *  FROM  stock`,(err,result)=>{console.log(result.rows)})
 
 let error="";
 app.get("/",checkAuthenitcated,async(req,res)=>{
     const {user_id} = verifyJwt(req.cookies['token']);
-    db.query('SELECT  * FROM user_stocks u INNER JOIN stock s ON u.name = s.name WHERE user_id = $1',[user_id],(err,data)=>{
-        if(err){ console.log('error is:' ,err.message) 
-                return;}
-                //console.log(data.rows);
-        res.render('index',{db:data.rows,error});
-    })
-    error='';
+    const data = await db.query('SELECT  * FROM user_stocks u INNER JOIN stock s ON u.name = s.name WHERE user_id = $1',[user_id]);
+    res.render('index',{db:data.rows,error});
+    error="";
 })
+
+// let nke_data = await yahooFinance.quote("nke",['summaryDetail','price',"calendarEvents"])
+// console.log(new Date(nke_data.calendarEvents.exDividendDate).toString(),new Date().toString());
 
 
 // Adding and updating Stocks
@@ -74,21 +79,22 @@ app.post("/", async (req,res)=>{
                     error ='Ticker Not Found!';
                     return res.redirect('/');
                 }
-    
             let yields = stock_data.summaryDetail.dividendRate || 
                             stock_data.summaryDetail.trailingAnnualDividendRate ||
                             stock_data.summaryDetail.yield *stock_data.summaryDetail.open||0;
             let price = stock_data.price.regularMarketPrice || stock_data.summaryDetail.open;
-            let dividendDate = (stock_data.calendarEvents && stock_data.calendarEvents.dividendDate)
-                                                            ? stock_data.calendarEvents.dividendDate:'';
+            let dividendDate = (stock_data.calendarEvents && stock_data.calendarEvents.exDividendDate)
+                                                            ? stock_data.calendarEvents.exDividendDate.toString().substring(4,15):'';
                 yields = parseFloat((yields).toFixed(3));
+            let monthly_payer = await check_if_monthly_dividend_payer(stock_name);
+            let dividend_amount = (monthly_payer)?yields/12:yields/4;
+                console.log('line 92:',stock_name,monthly_payer,dividend_amount);
             // Inserting new Stock data to stock db
-            const insert = `INSERT INTO stock(name,price,yield,dividendDate) VALUES ($1,$2,$3,$4)`;
-            const data = [stock_name.toUpperCase(),price,yields,dividendDate];
-    
-            db.query(insert,data,(err,result)=>{
+            const insert = `INSERT INTO stock(name,price,yield,dividendDate,monthly_payer,dividend_amount) VALUES ($1,$2,$3,$4,$5,$6)`;
+            const data = [stock_name.toUpperCase(),price,yields,dividendDate,monthly_payer,dividend_amount];
+            db.query(insert,data ,(err,result)=>{
                 if(result){
-                    console.log('successful insert');
+                    console.log('successful insert: ');
                 }
                 // send error message
                 if(err){
@@ -100,22 +106,25 @@ app.post("/", async (req,res)=>{
 
 
     };
-
     // Insert data in user_stock table
-    const yields = await db.query(`SELECT yield FROM stock WHERE name = $1`,[stock_name.toUpperCase()]);
-    if(yields){
+    const yields = await db.query(`SELECT yield,dividenddate FROM stock WHERE name = $1`,[stock_name.toUpperCase()]);
+    if(yields.rows){
+        console.log("line 113",yields.rows)
         stock_quantity = parseFloat(stock_quantity);
         stock_name = stock_name.toUpperCase();
         let estimated_Annual_dividends = parseFloat(yields.rows[0].yield*stock_quantity).toFixed(4);
+            let user_dividend_date = new Date(req.body.user_dividend_date.replace(/-/g, '\/').replace(/T.+/, '') )|| '';
+                user_dividend_date = (user_dividend_date && req.body.user_dividend_date)?user_dividend_date.toISOString().slice(0,10):'';
+            // console.log('user date is:',req.body.user_dividend_date,'parsed is: ',user_dividend_date)
         // check if the stock exists in the users_stock table
                 const isStockInUserStockTable = await db.query(`SELECT * FROM user_stocks WHERE name = $1 AND user_id = $2`,[stock_name,user_id]);
                 console.log('isStockInUserStockTable',isStockInUserStockTable.rows.length);
                 if(isStockInUserStockTable.rows.length == 0){
                     // stock is not in user_stock table so insert into user_stock
-                    let values = [user_id,stock_name,stock_quantity,estimated_Annual_dividends];
+                    let values = [user_id,stock_name,stock_quantity,estimated_Annual_dividends,user_dividend_date];
                     console.log('values is:',values);
 
-                    db.query(`INSERT INTO user_stocks (user_id,name,quantity,total) VALUES ($1,$2,$3,$4)`,values,(err)=>{
+                    db.query(`INSERT INTO user_stocks (user_id,name,quantity,total,user_dividend_date) VALUES ($1,$2,$3,$4,$5)`,values,(err)=>{
                         if(err){console.log('insert error is:',err.message);  error = "Error inserting user stock data";}
                         return res.redirect('/');
                     });
@@ -123,6 +132,7 @@ app.post("/", async (req,res)=>{
                 // update the stock quantity 
                     db.query(`UPDATE user_stocks SET quantity = $1 , total = $4 WHERE user_id = $2 AND name = $3`,[stock_quantity,user_id,stock_name,estimated_Annual_dividends],(err)=>{
                         if(err)  error = "Error with updating stock data";
+                        //if(yields.dividenddate == '')update_user_entered_dividend_dates();
                         return res.redirect('/');
                     });
                 }
@@ -178,7 +188,10 @@ app.post('/user/logout',(req,res)=>{
     res.redirect('/login');
 })
 
-
+//hourly_Update_Stock_Price(db)
 setInterval(()=>{hourly_Update_Stock_Price(db);},1000*60*60);
 setInterval(()=>{monthly_update_dividend_data(db);},1000*60*60*24*21);
+setInterval(()=>{update_user_entered_total_dividends_earned()},1000*60*60*24*21);
+setInterval(()=>{update_total_dividends_earned()},1000*60*60*24);
+setInterval(()=>{update_user_entered_dividend_dates()},1000*60*60*24);
 app.listen(port,()=> `Running on port ${port}`);
