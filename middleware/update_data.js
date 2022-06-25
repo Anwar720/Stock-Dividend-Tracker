@@ -88,7 +88,7 @@ const update_user_entered_total_dividends_earned = async ()=>{
         const reinvestment_amount = stock.yield / rate;
         const reinvestment_quantity  =  (reinvestment_amount/stock.price).toFixed(4);
         console.log('updating dividends earned:',stock.name,' amount:',reinvestment_amount);
-        db.query(`UPDATE user_stocks SET total_dividends_earned = total_dividends_earned + $1,quantity = quantity + $3  WHERE name = $2 AND user_id = $4`,[reinvestment_amount,stock.name,reinvestment_quantity,stock.user_id])
+        db.query(`UPDATE user_stocks SET total_dividends_earned = total_dividends_earned + $1,quantity = quantity + $3  WHERE name = $2 AND user_id = $4`,[reinvestment_amount*stock.quantity,stock.name,reinvestment_quantity*stock.quantity,stock.user_id])
     })
 }
 
@@ -97,9 +97,9 @@ const update_user_entered_total_dividends_earned = async ()=>{
 const update_user_entered_dividend_dates = async ()=>{
     let today = new Date().toISOString().slice(0,10);
     const stock_list = await db.query(`select * from user_stocks where user_dividend_date != '' AND user_dividend_date < $1`,[today]);
-        console.log(stock_list.rows)
+        // console.log(stock_list.rows)
     stock_list.rows.forEach(async stock=>{
-        if(stock.total > 0){// stock pays dividends
+        if(stock.total > 0 && stock.user_dividend_date.substring(5,7) !== today.substring(5,7)){// stock pays dividends
             let isMonthly = await check_if_monthly_dividend_payer(stock.name);
             let nextDividend = (isMonthly)?1:4;
             let user_date  = new Date(stock.user_dividend_date);
@@ -108,9 +108,7 @@ const update_user_entered_dividend_dates = async ()=>{
             db.query(`UPDATE user_stocks SET user_dividend_date = $1 WHERE user_id = $2 AND name = $3`,[nextDate,stock.user_id,stock.name],(err)=>{if(err)console.log(err)})
         }
     })
-
 }
-// update_user_entered_dividend()
 
 export{hourly_Update_Stock_Price,
         monthly_update_dividend_data,

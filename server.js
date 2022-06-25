@@ -16,8 +16,10 @@ import {verifyJwt,
         checkAuthenitcated,
         checkNotAuthenticated} from './middleware/verification.middleware.js';
 import {Validation,
-        validationResult} from './middleware/validation.middleware.js';
+        validationResult,validate_stock_input} from './middleware/validation.middleware.js';
 import {checkStockInDb} from './middleware/checkDB.middleware.js'
+import {check} from 'express-validator';
+
 const app = express();
 const port = process.env.PORT || 3000;
 
@@ -52,12 +54,14 @@ app.get("/",checkAuthenitcated,async(req,res)=>{
     error="";
 })
 
-// let nke_data = await yahooFinance.quote("nke",['summaryDetail','price',"calendarEvents"])
-// console.log(new Date(nke_data.calendarEvents.exDividendDate).toString(),new Date().toString());
-
 
 // Adding and updating Stocks
 app.post("/", async (req,res)=>{
+    // validate user input
+    if(!validate_stock_input(req)){
+        error = "Invalid Ticker Info";
+        return res.redirect("/");
+    }
     const {user_id} = verifyJwt(req.cookies['token']) ;
     let {stock_name,stock_quantity} = req.body;
     const isStockFound = await db.query(`SELECT * FROM stock WHERE name = $1`,[`${stock_name.toUpperCase()}`]);
@@ -191,7 +195,7 @@ app.post('/user/logout',(req,res)=>{
 //hourly_Update_Stock_Price(db)
 setInterval(()=>{hourly_Update_Stock_Price(db);},1000*60*60);
 setInterval(()=>{monthly_update_dividend_data(db);},1000*60*60*24*21);
-setInterval(()=>{update_user_entered_total_dividends_earned()},1000*60*60*24*21);
+setInterval(()=>{update_user_entered_total_dividends_earned()},1000*60*60*24);
 setInterval(()=>{update_total_dividends_earned()},1000*60*60*24);
 setInterval(()=>{update_user_entered_dividend_dates()},1000*60*60*24);
 app.listen(port,()=> `Running on port ${port}`);

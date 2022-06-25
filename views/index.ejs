@@ -31,7 +31,7 @@
         <form id="add-data" class="add-data" method="post" action="/">
             <i id="close" class="fas fa-times"></i>
             <span  class="stock-data"><span>* Ticker Name:</span><input name="stock_name" id="stock_name" type="text" autocomplete="off" required ></span>    
-            <span class="stock-data"><span>* Quantity:</span><input type="text" name="stock_quantity" id="stock_quantity" autocomplete="off" required></span>    
+            <span class="stock-data"><span>* Quantity:</span><input type="number" step="any" name="stock_quantity" id="stock_quantity" autocomplete="off" required></span>    
             <span><span>Dividend Date: <input class="date" type="date" name="user_dividend_date">
                 <section class="optional">Optional- Index Fund and Mutual Fund Only</section></span></span>    
             <input  type="text" id="given_id" style="display:none" name="id" ></input>
@@ -59,10 +59,10 @@
                     <div class="inventory">
                         <div class="stock-ticker inv-field stock_name"><%= db[i].name %></div>
                         <div class="stock-price inv-field ">$<%=db[i].price.toFixed(2)%></div>
-                        <div class="stock-quantity inv-field"><%= db[i].quantity %></div>
+                        <div class="stock-quantity inv-field"><%= db[i].quantity.toFixed(3).replace(/0{0,2}$/, ""); %></div>
                         <div class="stock-quantity inv-field"><%=  (db[i].yield/parseFloat(db[i].price)*100).toFixed(2) %>%</div>
                         <div class="stock-yield inv-field">$<%= db[i].yield.toFixed(2) || '0.00'%></div>
-                        <div class="stock-yield inv-field"><%=db[i].total_dividends_earned.toFixed(2)%></div>
+                        <div class="stock-yield inv-field">$<%=db[i].total_dividends_earned.toFixed(2)%></div>
                         <div class="stock-total inv-field">$<%= db[i].total.toFixed(2) || '0.00' %></div>
                         <span class="controls">
                         <button data-id='<%= db[i].id %>' title="Delete" class="delete" ><i class="fas fa-trash-alt"></i></button>
@@ -77,7 +77,7 @@
                 <div class="results">
                     <!-- changing this will affect bar graph data -->
                     <h2 class="sum dividend_rate">Annual Dividend Rate: <%= ((totalSum/totalCash*100).toFixed(2) > 0)?(totalSum/totalCash*100).toFixed(2):0 %>%</h2>
-                    <h2 class="sum expected_income">Expected Dividend Income:  $<%=parseFloat((totalSum).toFixed(2))%></h2>
+                    <h2 class="sum expected_income">Annual Dividend Income:  $<%=parseFloat((totalSum).toFixed(2))%></h2>
                     <h2 class="sum">Dividends Earned:  $<%= dividends_earned.toFixed(2) %></h2>
                 </div>
         </div>
@@ -118,7 +118,11 @@
             <button id="calculate">Submit</button>
         </div>
         <div id="bar_graph"></div>
+        <div class="footer">
+            Copyright <i class="fas fa-copyright"></i> 2022 Anwar Jahid
+        </div>
     </div>
+    
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="/js/script.js"></script>
 

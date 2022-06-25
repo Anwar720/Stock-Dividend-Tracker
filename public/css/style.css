@@ -12,13 +12,13 @@ body{
     display:grid;
     place-items: center;
     overflow-x: hidden;
-    transition:0.4s ease-in;
+    transition:0.4s ease-in-out;
 }
 .container{
     background:rgb(99, 107, 130);
     width:100vw;
     padding:1rem;
-    /* padding-right:1rem; */
+    padding-right: 1.07rem;
     text-align: center;
     box-shadow: 0 0 10px black ;
     background-image: linear-gradient(rgb(107, 117, 147) ,rgb(145, 117, 181),rgb(107, 117, 147),#675182f3 ,rgb(107, 117, 147) );
@@ -139,15 +139,15 @@ input[type="date"]::-webkit-calendar-picker-indicator {
     filter: invert(0.9);
 }
 input[type="date"]{
-    background-color: rgb(91, 98, 110);;
+    background-color: rgb(91, 98, 110);
     color:white;
     padding:5px 10px;
     border-radius:10px;
 }
 .sum{
     margin:15px 10px;
-    text-align: end;
     font-size: 1.1rem;
+    border-radius: 10px;    
 }
 
 #close{
@@ -178,6 +178,9 @@ i{
     font-size: 11px;
     text-shadow: 0 0 2px rgb(85, 36, 36);
 }
+.delete i:hover{
+    text-shadow: 0 0 1px rgb(159, 55, 55);
+}
 .edit{
     align-items: center;
     border:none;
@@ -194,6 +197,10 @@ i{
     font-size: 12px;
     /* text-shadow: 0 0 1px rgb(185, 245, 193); */
     text-shadow: 0 0 1px rgb(66, 100, 71);
+}
+.edit i:hover{
+    text-shadow: 0 0 0.5px rgb(245, 247, 245);
+
 }
 #piechart_3d {
     /* width: 9vw;  */
@@ -240,10 +247,10 @@ i{
     animation-iteration-count: infinite;
 }
 .error{
-    background:#a91530cd;
-    color:rgb(167, 189, 249);
+    background:#e43757b3;
+    color:rgb(202, 214, 250);
     margin-bottom:5px;
-    padding:10px 0;
+    padding:10px 5px;
     border-radius:8px;
 
 }
@@ -260,7 +267,8 @@ i{
 }
 
 .delete_confirm{
-    background:rgb(87, 90, 116);
+    /* background:rgb(87, 90, 116); */
+    background:rgb(41, 42, 50);
     height:15rem;
     width:auto;
     padding:1rem;
@@ -278,11 +286,15 @@ i{
     color:white;
 }
 .cancel_delete{
-    background-color: rgba(158, 128, 169, 0.709);
+    background-color: rgba(84, 77, 87, 0.709);
 }
 .verify_delete{
     background:rgba(244, 43, 43, 0.74);
 }
+.cancel_delete:hover,
+.verify_delete:hover{
+    box-shadow: 0 0 7px rgb(133, 129, 129);
+} 
 #bar_graph{
     height:30rem;
     /* padding:10px 0 ; */

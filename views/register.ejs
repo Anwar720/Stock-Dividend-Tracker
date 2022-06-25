@@ -8,9 +8,9 @@
             <section><i class="fa fa-lock"></i><input type="password" name="password" id="password" placeholder="Password" required></section>
             <section><i class="fa fa-lock"></i><input type="password" id="verify-password" placeholder="Verify Password" required></section>
             <% if (error) { %>
-                <p class="server_error"><%= error %></p>
+                <p class="server_error error"><%= error %></p>
                 <% } %>  
-            <p class="errors"></p>
+            <!-- <p class="errors"></p> -->
             <input type="submit" class="register_submit" value="submit">
         </form>
 
