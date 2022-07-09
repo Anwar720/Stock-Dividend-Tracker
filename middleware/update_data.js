@@ -63,13 +63,10 @@ const check_if_monthly_dividend_payer = async (stock)=>{
 }
 //updates dividends recieved based on yahoo finance data
 const update_total_dividends_earned = async ()=>{
-    // let today = new Date().toString().replace(/T.+/, '').substring(4,15);
-    let today = 'Jul 04 2022'
-    // let update_quantity_list = await db.query(`SELECT name,yield,price FROM stock WHERE dividenddate = $1`,[today]);
+    let today = new Date().toString().replace(/T.+/, '').substring(4,15);
     let update_quantity_list = await db.query(`SELECT * FROM stock u INNER JOIN user_stocks s ON u.name = s.name WHERE dividenddate = $1`,[today]);
     //console.log('update stock dividend list for :',today,update_quantity_list.rows);
     update_quantity_list.rows.forEach(async (stock)=>{
-        // console.log(stock);
         const isMonthlyPayer = await check_if_monthly_dividend_payer(stock.name);
         const rate = (isMonthlyPayer)?12:4;
         const reinvestment_amount = stock.yield / rate;
