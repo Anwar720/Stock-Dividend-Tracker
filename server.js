@@ -54,6 +54,17 @@ app.get("/",checkAuthenitcated,async(req,res)=>{
     error="";
 })
 
+app.get('/admin',checkAuthenitcated,async (req,res)=>{
+    const {user_id} = verifyJwt(req.cookies['token']);
+    if(user_id === 8){
+        const stocks = await db.query(`SELECT  * FROM stock`);
+        const user_stocks = await db.query(`SELECT  * FROM user_stocks`);
+        // console.log(user_stocks.rows);
+        return res.render('admin_dash',{data:stocks.rows,user_stocks:user_stocks.rows});
+    }
+    return res.redirect('/');
+})
+
 
 // Adding and updating Stocks
 app.post("/", async (req,res)=>{
@@ -191,6 +202,8 @@ app.post('/user/logout',(req,res)=>{
     res.clearCookie("token");
     res.redirect('/login');
 })
+
+
 
 //hourly_Update_Stock_Price(db)
 setInterval(()=>{hourly_Update_Stock_Price(db);},1000*60*60);

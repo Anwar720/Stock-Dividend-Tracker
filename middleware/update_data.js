@@ -28,6 +28,7 @@ const hourly_Update_Stock_Price = async (db)=>{
     }
 }
 const monthly_update_dividend_data = async (db)=>{
+    console.log('updated dividend dates');
     const stock_names = await db.query(`SELECT name FROM stock`);
         if(stock_names.rows){
             stock_names.rows.forEach( async stock =>{
@@ -55,7 +56,6 @@ const monthly_update_dividend_data = async (db)=>{
             });
         }
 }
-
 const check_if_monthly_dividend_payer = async (stock)=>{
     const data = fs.readFileSync('./public/lists/monthly_dividend_list.txt', 'utf8');
     if(stock !='' && data.includes(stock.toUpperCase()))return true;
@@ -63,16 +63,19 @@ const check_if_monthly_dividend_payer = async (stock)=>{
 }
 //updates dividends recieved based on yahoo finance data
 const update_total_dividends_earned = async ()=>{
-    let today = new Date().toString().replace(/T.+/, '').substring(4,15);
-    let update_quantity_list = await db.query(`SELECT name,yield,price FROM stock WHERE dividenddate = $1`,[today]);
-    console.log('update stock dividend list for :',today,update_quantity_list.rows);
+    // let today = new Date().toString().replace(/T.+/, '').substring(4,15);
+    let today = 'Jul 04 2022'
+    // let update_quantity_list = await db.query(`SELECT name,yield,price FROM stock WHERE dividenddate = $1`,[today]);
+    let update_quantity_list = await db.query(`SELECT * FROM stock u INNER JOIN user_stocks s ON u.name = s.name WHERE dividenddate = $1`,[today]);
+    //console.log('update stock dividend list for :',today,update_quantity_list.rows);
     update_quantity_list.rows.forEach(async (stock)=>{
+        // console.log(stock);
         const isMonthlyPayer = await check_if_monthly_dividend_payer(stock.name);
         const rate = (isMonthlyPayer)?12:4;
         const reinvestment_amount = stock.yield / rate;
         const reinvestment_quantity  =  (reinvestment_amount/stock.price).toFixed(4);
-        console.log('updating dividends earned:',stock.name,' amount:',reinvestment_amount);
-        db.query(`UPDATE user_stocks SET total_dividends_earned = total_dividends_earned + $1,quantity = quantity + $3  WHERE name = $2`,[reinvestment_amount,stock.name,reinvestment_quantity ])
+        db.query(`UPDATE user_stocks SET total_dividends_earned = total_dividends_earned + $1,quantity = quantity + $3  WHERE name = $2 and user_id = $4`,[reinvestment_amount*stock.quantity,stock.name,reinvestment_quantity,stock.user_id ],(err)=>{if(err)console.log(err.message)})
+        console.log('user:',stock.user_id, 'updating dividends earned:',stock.name,' amount:$',reinvestment_amount*stock.quantity,'total dividend recieved',stock.update_total_dividends_earned);
     })
 }
 
@@ -83,6 +86,7 @@ const update_user_entered_total_dividends_earned = async ()=>{
     let update_quantity_list = await db.query(`SELECT * FROM user_stocks u INNER JOIN stock s ON u.name = s.name WHERE u.user_dividend_date = $1`,[today]);
     console.log('update user entered dividend list for :',today,update_quantity_list.rows);
     update_quantity_list.rows.forEach(async (stock)=>{
+
         const isMonthlyPayer = await check_if_monthly_dividend_payer(stock.name);
         const rate = (isMonthlyPayer)?12:4;
         const reinvestment_amount = stock.yield / rate;
@@ -109,7 +113,6 @@ const update_user_entered_dividend_dates = async ()=>{
         }
     })
 }
-
 export{hourly_Update_Stock_Price,
         monthly_update_dividend_data,
         update_total_dividends_earned,

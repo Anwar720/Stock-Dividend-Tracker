@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.15.4/css/all.css">
+
+    <title>Dash</title>
+</head>
+<body>
+<div class="container">
+            <div class="stock_list">
+                <a href="/" class="home_btn"><i class="fas fa-home"></i></a>
+                <h4>Stock data from Stock Table</h4>
+                <div class="stocks">
+                    <%data = data.sort((a,b)=> a.name.localeCompare(b.name)) %>
+                    <% for(let i = 0; i < data.length;i++){ %>
+                        <ul class="item">
+                                <h4 class="ticker"><%= data[i].name %></h4>
+                                <li>Price:           <section>$ <%= data[i].price%></section></li>
+                                <li>yield:           <section><%= data[i].yield %></section></li>
+                                <li>dividenddate:    <section><%= data[i].dividenddate %></section></li>
+                                <li>dividend amount: <section>$ <%= data[i].dividend_amount.toFixed(3) %></section></li>
+                            </ul>
+                    <%  } %>
+                </div>
+            </div>
+
+            <% user_stocks = user_stocks.sort((a,b)=> a.user_id - b.user_id) %>
+            <% let current_user = 0; %>
+            <div class="user_stocks">
+                <h4>User Stocks</h4>
+                <% for(let i = 0; i < user_stocks.length;i++){ %>
+                    <% if( current_user != user_stocks[i].user_id){ %>
+                        <h4 class="ticker user_id">User:  <%= user_stocks[i].user_id %></h4>
+                        <section class="line"></section>
+                        <% current_user = user_stocks[i].user_id; %>
+                    <% } %>
+                    <ul class="item">
+                                <h4><%= user_stocks[i].name%></h4>
+                                <li>Quantity:           <section><%= user_stocks[i].quantity.toFixed(2)%></section></li>
+                                <li>Dividends earned:    <section>$<%= user_stocks[i].total_dividends_earned.toFixed(2)%></section></li>
+                                <li>dividend date: <section> <%= user_stocks[i].user_dividend_date%></section></li>
+                    </ul>
+                <%  } %>
+            </div>
+
+
+</div>
+
+</body>
+</html>

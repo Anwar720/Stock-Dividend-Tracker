@@ -342,10 +342,10 @@ select{
     align-items: center;
     gap:10px;
 }
-.logout{
+/* .logout{
     width:fit-content;
-}
-.logout > input{
+} */
+.logout > button{
     min-height:2.5rem;
     min-width:3rem;
     padding:1vw;
@@ -353,6 +353,13 @@ select{
     cursor:pointer;
     color:white;
     border-radius:10px;
+}
+.logout i{
+    color:rgb(252, 251, 251);
+    font-size: 15px;
+}
+.logout button:hover{
+    box-shadow: 0 0 7px rgba(33, 32, 32, 0.666);
 }
 .server_error{
     position:relative;

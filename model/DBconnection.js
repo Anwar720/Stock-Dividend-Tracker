@@ -70,7 +70,9 @@ db.query(USER_STOCK ,(err)=>{
 
 //db.query(`SELECT * FROM user_stocks`,(err,res)=>{console.log(res.rows)})
 // db.query(`SELECT * FROM stock`,(err,res)=>{console.log(res.rows)})
+// db.query(`SELECT * FROM users`,(err,res)=>{console.log(res.rows)})
 // db.query(`UPDATE user_stocks SET user_dividend_date = ''`,(err)=>{if(err)console.log(err)})
-// db.query(`UPDATE user_stocks SET total_dividends_earned = 0 WHERE name = 'SPHD'`,(err)=>{if(err)console.log(err)})
-// db.query(`DELETE FROM stock WHERE name = 'DCF'`)
+// db.query(`UPDATE user_stocks SET total_dividends_earned = 0 WHERE name = 'JPM'`,(err)=>{if(err)console.log(err)})
+// db.query(`UPDATE stock SET dividenddate = '' WHERE name = 'AGNC'`,(err)=>{if(err)console.log(err)})
+// db.query(`DELETE FROM stock WHERE name = 'AMX'`)
 export{db}
