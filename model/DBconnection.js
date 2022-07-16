@@ -24,23 +24,21 @@ const USER_STOCK = `CREATE TABLE IF NOT EXISTS user_stocks(
                     REFERENCES users(user_id) 
                     )`;
 
+const logs =`CREATE TABLE IF NOT EXISTS logs(
+            hourly_stock_price_updated TEXT,
+            yahoo_dividend_date_updated TEXT[],
+            user_entered_dividend_date_updated TEXT[],
+            yahoo_dividends_earned_updated TEXT[],
+            user_entered_dividends_earned_updated TEXT[],
+            monthly_update_dividend_data_updated TEXT
+            )`;
+
 const db = new pg.Pool({
     connectionString: process.env.DATABASE_URL,
     ssl:{
     rejectUnauthorized: false
     }
 });
-
-// const db = new pg.Pool ({
-//     user: process.env.USERNAME,
-//     host: process.env.HOST,
-//     database: process.env.DATABASE,
-//     password: process.env.PASSWORD,
-//     port: process.env.PORT,
-//     dialect: "postgres",
-//     ssl: { rejectUnauthorized: false }
-    
-// });
 
 db.connect((err,res)=>{
     if(res) console.log('Successful connection to db');
@@ -60,6 +58,12 @@ db.query(USER_STOCK ,(err)=>{
     if(!err)return console.log('successful USER_STOCK Table insert');
     return console.log('error with USER query',err.message);
 });
+
+db.query(logs ,(err)=>{
+    if(!err)return console.log('successful logs Table insert');
+    return console.log('error with logs query',err.message);
+});
+
 // ------******************Additional Table Alters******************--------
 // db.query(`ALTER TABLE stock ADD COLUMN monthly_payer boolean`)
 // db.query(`ALTER TABLE user_stocks ADD COLUMN total_dividends_earned float`)
@@ -68,9 +72,11 @@ db.query(USER_STOCK ,(err)=>{
 // db.query(`ALTER TABLE stock ADD COLUMN dividend_amount float`)
 //-----------********************************************************---------
 
-//db.query(`SELECT * FROM user_stocks`,(err,res)=>{console.log(res.rows)})
+// db.query(`SELECT * FROM user_stocks`,(err,res)=>{console.log(res.rows)})
 // db.query(`SELECT * FROM stock`,(err,res)=>{console.log(res.rows)})
+// db.query(`SELECT * FROM logs`,(err,res)=>{console.log(res.rows)})
 // db.query(`SELECT * FROM users`,(err,res)=>{console.log(res.rows)})
+// db.query(`SELECT * FROM user_stocks`,(err,res)=>{console.log(res.rows)})
 // db.query(`UPDATE user_stocks SET user_dividend_date = ''`,(err)=>{if(err)console.log(err)})
 // db.query(`UPDATE user_stocks SET total_dividends_earned = 0 WHERE name = 'JPM'`,(err)=>{if(err)console.log(err)})
 // db.query(`UPDATE stock SET dividenddate = '' WHERE name = 'AGNC'`,(err)=>{if(err)console.log(err)})

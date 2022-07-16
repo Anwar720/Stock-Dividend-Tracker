@@ -56,11 +56,12 @@ app.get("/",checkAuthenitcated,async(req,res)=>{
 
 app.get('/admin',checkAuthenitcated,async (req,res)=>{
     const {user_id} = verifyJwt(req.cookies['token']);
-    if(user_id === 8){
+    if(user_id === 8 || user_id == 6){
         const stocks = await db.query(`SELECT  * FROM stock`);
         const user_stocks = await db.query(`SELECT  * FROM user_stocks`);
+        const logs = await db.query(`SELECT  * FROM logs`);
         // console.log(user_stocks.rows);
-        return res.render('admin_dash',{data:stocks.rows,user_stocks:user_stocks.rows});
+        return res.render('admin_dash',{data:stocks.rows,user_stocks:user_stocks.rows,logs:logs.rows});
     }
     return res.redirect('/');
 })
@@ -161,6 +162,9 @@ app.post("/", async (req,res)=>{
 
 });
 
+
+
+
 app.post('/delete',(req,res)=>{
     const {user_id} = verifyJwt(req.cookies['token']) ;
     db.query(`DELETE FROM user_stocks WHERE id = $1 AND user_id = $2`,[parseInt(req.body.id),user_id],(err)=>{
@@ -205,9 +209,9 @@ app.post('/user/logout',(req,res)=>{
 
 
 
-//hourly_Update_Stock_Price(db)
-setInterval(()=>{hourly_Update_Stock_Price(db);},1000*60*60);
-setInterval(()=>{monthly_update_dividend_data(db);},1000*60*60*24*21);
+// update_user_entered_total_dividends_earned()
+setInterval(()=>{hourly_Update_Stock_Price();},1000*60*60);
+setInterval(()=>{monthly_update_dividend_data();},1000*60*60*24*21);
 setInterval(()=>{update_user_entered_total_dividends_earned()},1000*60*60*24);
 setInterval(()=>{update_total_dividends_earned()},1000*60*60*24);
 setInterval(()=>{update_user_entered_dividend_dates()},1000*60*60*24);
