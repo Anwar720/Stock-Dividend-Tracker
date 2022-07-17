@@ -4,6 +4,7 @@ import bodyparser from 'body-parser';
 import yahooFinance from 'yahoo-finance';
 import cookieParser from 'cookie-parser';
 import {db} from './model/DBconnection.js';
+import schedule from 'node-schedule';
 import {hourly_Update_Stock_Price,
         monthly_update_dividend_data,
         update_total_dividends_earned,
@@ -19,6 +20,7 @@ import {Validation,
         validationResult,validate_stock_input} from './middleware/validation.middleware.js';
 import {checkStockInDb} from './middleware/checkDB.middleware.js'
 import {check} from 'express-validator';
+import { scheduleJob } from 'node-schedule';
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -163,8 +165,6 @@ app.post("/", async (req,res)=>{
 });
 
 
-
-
 app.post('/delete',(req,res)=>{
     const {user_id} = verifyJwt(req.cookies['token']) ;
     db.query(`DELETE FROM user_stocks WHERE id = $1 AND user_id = $2`,[parseInt(req.body.id),user_id],(err)=>{
@@ -207,12 +207,16 @@ app.post('/user/logout',(req,res)=>{
     res.redirect('/login');
 })
 
-
+const hourly_price_updater = schedule.scheduleJob({minute:0,tz:'EST'},hourly_Update_Stock_Price);
+const monthly_dividend_date_updater = schedule.scheduleJob({date:1,tz:'EST'},monthly_update_dividend_data);
+const user_entered_total_dividends_earned_updater = schedule.scheduleJob({hour:0,tz:'EST'},update_user_entered_total_dividends_earned);
+const total_dividends_earned_updater = schedule.scheduleJob({hour:0,tz:'EST'},update_total_dividends_earned);
+const user_entered_dividend_dates_updater = schedule.scheduleJob({hour:0,tz:'EST'},update_user_entered_dividend_dates);
 
 // update_user_entered_total_dividends_earned()
-setInterval(()=>{hourly_Update_Stock_Price();},1000*60*60);
-setInterval(()=>{monthly_update_dividend_data();},1000*60*60*24*21);
-setInterval(()=>{update_user_entered_total_dividends_earned()},1000*60*60*24);
-setInterval(()=>{update_total_dividends_earned()},1000*60*60*24);
-setInterval(()=>{update_user_entered_dividend_dates()},1000*60*60*24);
+// setInterval(()=>{hourly_Update_Stock_Price();},1000*60*60);
+// setInterval(()=>{monthly_update_dividend_data();},1000*60*60*24*21);
+// setInterval(()=>{update_user_entered_total_dividends_earned()},1000*60*60*23);
+// setInterval(()=>{update_total_dividends_earned()},1000*60*60*23);
+setInterval(()=>{update_user_entered_dividend_dates()},1000*60*60*23);
 app.listen(port,()=> `Running on port ${port}`);

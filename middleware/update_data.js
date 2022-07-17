@@ -6,7 +6,7 @@ const hourly_Update_Stock_Price = async ()=>{
     const date = new Date();
     const day  = date.getDay();
     const time = date.getHours();
-
+    console.log('called hourly price')
     if(day > 0 && day < 6  && time > 9 && time < 16){
         const stock_names = await db.query(`SELECT name FROM stock`);
         if(stock_names.rows){
