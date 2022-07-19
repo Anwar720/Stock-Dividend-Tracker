@@ -6,8 +6,8 @@ const hourly_Update_Stock_Price = async ()=>{
     const date = new Date();
     const day  = date.getDay();
     const time = date.getHours();
-    console.log('called hourly price')
-    if(day > 0 && day < 6  && time > 9 && time < 16){
+    console.log('called hourly price',date,time);
+    if(day > 0 && day < 6  && time >= 9 && time < 16){
         const stock_names = await db.query(`SELECT name FROM stock`);
         if(stock_names.rows){
             stock_names.rows.forEach( async stock=>{
@@ -23,7 +23,9 @@ const hourly_Update_Stock_Price = async ()=>{
                 }
             })
             //log 
-            db.query(`UPDATE logs SET  hourly_stock_price_updated = $1`,[date.toString()],(err)=>{
+            db.query(`UPDATE logs SET  hourly_stock_price_updated = $1`,[date.toLocaleString('en-US', {
+                timeZone: 'America/New_York',
+            })],(err)=>{
                 (err)?console.log(err.message):console.log('success update stock price')});
 
             console.log('Updating Stock Prices');
@@ -59,22 +61,25 @@ const monthly_update_dividend_data = async ()=>{
                             
                     //log data
                     const date = new Date();
-                    db.query(`UPDATE logs SET  monthly_update_dividend_data_updated = $1`,[date.toString()],(err)=>{
+                    db.query(`UPDATE logs SET  monthly_update_dividend_data_updated = $1`,[date.toLocaleString('en-US', {
+                        timeZone: 'America/New_York',
+                    })],(err)=>{
                         (err)?console.log(err.message):console.log('success update stock price')});
                 }
             });
         }
 }
 const check_if_monthly_dividend_payer = async (stock)=>{
+    let formated_stock = ' ' + stock + ' ';
     const data = fs.readFileSync('./public/lists/monthly_dividend_list.txt', 'utf8');
-    if(stock !='' && data.includes(stock.toUpperCase()))return true;
+    if(stock !='' && data.includes(formated_stock.toUpperCase()))return true;
     return false;
 }
 //updates dividends recieved based on yahoo finance data
 const update_total_dividends_earned = async ()=>{
-    let today = new Date().toString().replace(/T.+/, '').substring(4,15);
+    let today = new Date().toISOString().slice(0,10);
     let update_quantity_list = await db.query(`SELECT * FROM stock u INNER JOIN user_stocks s ON u.name = s.name WHERE dividenddate = $1`,[today]);
-    //console.log('update stock dividend list for :',today,update_quantity_list.rows);
+    // console.log('update stock dividend list for :',today,update_quantity_list.rows);
     update_quantity_list.rows.forEach(async (stock)=>{
         const isMonthlyPayer = await check_if_monthly_dividend_payer(stock.name);
         const rate = (isMonthlyPayer)?12:4;
@@ -89,8 +94,10 @@ const update_total_dividends_earned = async ()=>{
     const date = new Date();
     if(update_quantity_list.rows.length > 0) {
         const stock_names = update_quantity_list.rows.map(stock=>stock.name);
-        db.query(`UPDATE logs SET  yahoo_dividends_earned_updated = $1`,[[date,...stock_names]],(err)=>{
-                                                    (err)?console.log(err.message):console.log('success update stock price')});
+        db.query(`UPDATE logs SET  yahoo_dividends_earned_updated = $1`,[[date.toLocaleString('en-US', {
+            timeZone: 'America/New_York',
+        }),...stock_names]],(err)=>{
+            (err)?console.log(err.message):console.log('success update stock price')});
         }
 }
 
@@ -112,7 +119,9 @@ const update_user_entered_total_dividends_earned = async ()=>{
     const date = new Date();
     if(update_quantity_list.rows.length > 0) {
         const stock_names = update_quantity_list.rows.map(stock=>`${stock.user_id}:${stock.name}`);
-        db.query(`UPDATE logs SET  user_entered_dividends_earned_updated = $1`,[[date,...stock_names]]);
+        db.query(`UPDATE logs SET  user_entered_dividends_earned_updated = $1`,[[date.toLocaleString('en-US', {
+            timeZone: 'America/New_York',
+        }),...stock_names]]);
         }
 }
 
@@ -136,7 +145,9 @@ const update_user_entered_dividend_dates = async ()=>{
     const date = new Date();
     if(stock_list.rows.length > 0) {
         const stock_names = stock_list.rows.map(stock=>`${stock.user_id}:${stock.name}`);
-        db.query(`UPDATE logs SET  user_entered_dividend_date_updated = $1`,[[date,...stock_names]]);
+        db.query(`UPDATE logs SET  user_entered_dividend_date_updated = $1`,[[date.toLocaleString('en-US', {
+            timeZone: 'America/New_York',
+        }),...stock_names]]);
         }
 }
 

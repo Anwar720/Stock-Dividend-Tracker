@@ -99,6 +99,8 @@ i{
     margin:5px;
     margin-bottom:1.5rem;
     padding:1rem;
+    overflow-y: auto;
+    word-wrap: break-word;
 }
 .log section{
     color:rgb(255, 145, 0);
@@ -108,13 +110,16 @@ i{
 .log div{
     padding:10px;
     border-radius: 1rem;
-    height:5rem;
+    height:max-content;
     display: flex;
     flex-direction: column;
     align-items: flex-start;
     justify-content: center;
     gap:5px;
     overflow: hidden;
+    word-wrap: break-word; 
+    white-space: pre-wrap;
+    word-break: break-word;
 }
 @media (max-width:500px),(max-height:500px){
     .stocks ul, .user_stocks ul{
@@ -122,6 +127,9 @@ i{
     }
     .stocks, .user_stocks{
         padding:0px;
+    }
+    .log section{
+        font-size: 1rem;
     }
 
 }
