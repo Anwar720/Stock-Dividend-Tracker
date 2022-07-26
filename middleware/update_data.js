@@ -112,7 +112,8 @@ const update_user_entered_total_dividends_earned = async ()=>{
         const rate = (isMonthlyPayer)?12:4;
         const reinvestment_amount = stock.yield / rate;
         const reinvestment_quantity  =  (reinvestment_amount/stock.price).toFixed(4);
-        console.log('updating dividends earned:',stock.name,' amount:',reinvestment_amount);
+        // console.log('updating dividends earned:',stock.name,' amount per share:',reinvestment_amount, 'total reinvested:',reinvestment_amount*stock.quantity
+        // ,'reinvestment quantity is: ',reinvestment_quantity*stock.quantity);
         db.query(`UPDATE user_stocks SET total_dividends_earned = total_dividends_earned + $1,quantity = quantity + $3  WHERE name = $2 AND user_id = $4`,[reinvestment_amount*stock.quantity,stock.name,reinvestment_quantity*stock.quantity,stock.user_id])
     })
 

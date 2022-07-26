@@ -207,11 +207,11 @@ app.post('/user/logout',(req,res)=>{
     res.redirect('/login');
 })
 
-const hourly_price_updater = schedule.scheduleJob({minute:0,tz:'EST'},hourly_Update_Stock_Price);
+const hourly_price_updater = schedule.scheduleJob({minute:30,tz:'EST'},hourly_Update_Stock_Price);
 const monthly_dividend_date_updater = schedule.scheduleJob({date:1,tz:'EST'},monthly_update_dividend_data);
-const user_entered_total_dividends_earned_updater = schedule.scheduleJob({hour:0,tz:'EST'},update_user_entered_total_dividends_earned);
-const total_dividends_earned_updater = schedule.scheduleJob({hour:0,tz:'EST'},update_total_dividends_earned);
-const user_entered_dividend_dates_updater = schedule.scheduleJob({hour:0,tz:'EST'},update_user_entered_dividend_dates);
+const user_entered_total_dividends_earned_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_user_entered_total_dividends_earned);
+const total_dividends_earned_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_total_dividends_earned);
+const user_entered_dividend_dates_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_user_entered_dividend_dates);
 
 // update_user_entered_total_dividends_earned()
 // setInterval(()=>{hourly_Update_Stock_Price();},1000*60*60);
