@@ -43,7 +43,8 @@ const monthly_update_dividend_data = async ()=>{
                     dataFromYahoo  = await yahooFinance.quote(stock.name,['summaryDetail',"calendarEvents"]);
                 }catch(err){ console.log('yahoo dividend update error',err.message)};
 
-                if(dataFromYahoo){
+                let isMonthlyPayer = await check_if_monthly_dividend_payer(stock.name);
+                if(dataFromYahoo && !isMonthlyPayer){
                     let yields = dataFromYahoo.summaryDetail.dividendRate 
                                 || dataFromYahoo.summaryDetail.trailingAnnualDividendRate 
                                 ||dataFromYahoo.summaryDetail.yield *dataFromYahoo.summaryDetail.open || 0;
@@ -51,7 +52,7 @@ const monthly_update_dividend_data = async ()=>{
                             (dataFromYahoo.calendarEvents && dataFromYahoo.calendarEvents.dividendDate )?
                                 dataFromYahoo.calendarEvents.exDividendDate.toString().substring(4,15):'';
                     yields = parseFloat((yields).toFixed(3));
-                    let isMonthlyPayer = await check_if_monthly_dividend_payer(stock.name);
+                    // let isMonthlyPayer = await check_if_monthly_dividend_payer(stock.name);
                     //console.log(stock.name,dataFromYahoo)
                     console.log(stock.name,'dividendDate is:',dividendDate);
                     const rate = (isMonthlyPayer)?12:4;
@@ -75,9 +76,13 @@ const check_if_monthly_dividend_payer = async (stock)=>{
     if(stock !='' && data.includes(formated_stock.toUpperCase()))return true;
     return false;
 }
+
 //updates dividends recieved based on yahoo finance data
 const update_total_dividends_earned = async ()=>{
-    let today = new Date().toISOString().slice(0,10);
+    // let today = new Date().toISOString().slice(0,10);
+    let today = new Date().toString().slice(4,15)
+
+    console.log(today)
     let update_quantity_list = await db.query(`SELECT * FROM stock u INNER JOIN user_stocks s ON u.name = s.name WHERE dividenddate = $1`,[today]);
     // console.log('update stock dividend list for :',today,update_quantity_list.rows);
     update_quantity_list.rows.forEach(async (stock)=>{
