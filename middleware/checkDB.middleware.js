@@ -35,7 +35,6 @@ const insertStockInDb = async (stock_name,res)=>{
         let price = stock_data.price.regularMarketPrice || stock_data.summaryDetail.open;
         let dividendDate = (stock_data.calendarEvents && stock_data.calendarEvents.dividendDate )?stock_data.calendarEvents.dividendDate:'';
             yields = parseFloat((yields).toFixed(3));
-            console.log('yield in insertindb is:',yields);
             // Inserting new Stock to db
             const insert = `INSERT INTO stock(name,price,yield,dividendDate) VALUES 
             ($1,$2,$3,$4)`;
@@ -57,10 +56,7 @@ const insertStockInDb = async (stock_name,res)=>{
     }
 
 };
-const check = async ()=>{
-    let result = await checkStockInDb("aapl");
 
-};
 // db.query(`SELECT * FROM stock`,(err,result)=>{
 //     console.log(result.rows);
 // });

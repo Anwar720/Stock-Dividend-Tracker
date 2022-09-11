@@ -111,6 +111,11 @@ const change_Edit_Delete_Display = (item,value,padding) =>{
     item.lastElementChild.lastElementChild.style.display = value;
 }
 
+// progress bar
+const bar_fill = document.querySelector('.fill')
+bar_fill.style.width = bar_fill.dataset.fill;
+bar_fill.title = bar_fill.dataset.fill;
+
 
 // adjusting bargraph size
 window.addEventListener('resize', function(){

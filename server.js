@@ -102,8 +102,8 @@ app.post("/", async (req,res)=>{
                             stock_data.summaryDetail.trailingAnnualDividendRate ||
                             stock_data.summaryDetail.yield *stock_data.summaryDetail.open||0;
             let price = stock_data.price.regularMarketPrice || stock_data.summaryDetail.open;
-            let dividendDate = (stock_data.calendarEvents && stock_data.calendarEvents.exDividendDate)
-                                                            ? stock_data.calendarEvents.exDividendDate.toString().substring(4,15):'';
+            let dividendDate = (stock_data.calendarEvents && stock_data.calendarEvents.dividendDate)
+                                                            ? stock_data.calendarEvents.dividendDate.toString().substring(4,15):'';
                 yields = parseFloat((yields).toFixed(3));
             let monthly_payer = await check_if_monthly_dividend_payer(stock_name);
             let dividend_amount = (monthly_payer)?yields/12:yields/4;
@@ -150,7 +150,6 @@ app.post("/", async (req,res)=>{
                 // update the stock quantity 
                     db.query(`UPDATE user_stocks SET quantity = $1 , total = $4,user_dividend_date=$5 WHERE user_id = $2 AND name = $3`,[stock_quantity,user_id,stock_name,estimated_Annual_dividends,user_dividend_date],(err)=>{
                         if(err)  error = "Error with updating stock data";
-                        //if(yields.dividenddate == '')update_user_entered_dividend_dates();
                         return res.redirect('/');
                     });
                 }
@@ -213,10 +212,4 @@ const user_entered_total_dividends_earned_updater = schedule.scheduleJob({hour:0
 const total_dividends_earned_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_total_dividends_earned);
 const user_entered_dividend_dates_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_user_entered_dividend_dates);
 
-// update_user_entered_total_dividends_earned()
-// setInterval(()=>{hourly_Update_Stock_Price();},1000*60*60); 
-// setInterval(()=>{monthly_update_dividend_data();},1000*60*60*24*21);
-// setInterval(()=>{update_user_entered_total_dividends_earned()},1000*60*60*23);
-// setInterval(()=>{update_total_dividends_earned()},1000*60*60*23);
-// setInterval(()=>{update_user_entered_dividend_dates()},1000*60*60*23);
 app.listen(port,()=> `Running on port ${port}`);

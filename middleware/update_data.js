@@ -50,7 +50,7 @@ const monthly_update_dividend_data = async ()=>{
                                 ||dataFromYahoo.summaryDetail.yield *dataFromYahoo.summaryDetail.open || 0;
                     let dividendDate = 
                             (dataFromYahoo.calendarEvents && dataFromYahoo.calendarEvents.dividendDate )?
-                                dataFromYahoo.calendarEvents.exDividendDate.toString().substring(4,15):'';
+                                dataFromYahoo.calendarEvents.dividendDate.toString().substring(4,15):'';
                     yields = parseFloat((yields).toFixed(3));
                     // let isMonthlyPayer = await check_if_monthly_dividend_payer(stock.name);
                     //console.log(stock.name,dataFromYahoo)
