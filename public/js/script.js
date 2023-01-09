@@ -275,6 +275,7 @@ window.onload = async ()=>{
 function getDataForTimespan(timespan = 6){
     if(timespan == 100) return monthly_record;
     let numOfMonths = monthly_record.length
+    if(numOfMonths < 2) return monthly_record.push([`${new Date(new Date().setMonth(new Date().getMonth() - 1)).toString().substring(4,7)}-${new Date().getFullYear()}`,0]);
     return monthly_record.filter((stock,idx)=> idx == 0 || idx >= Math.ceil(numOfMonths - timespan))
 }
 

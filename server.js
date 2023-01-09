@@ -32,6 +32,8 @@ process.on('uncaughtException', (error)  => {
     process.exit(1);
 })
 
+//https://dividendhistory.org/payout/SPHD/
+
 app.set('view engine','ejs');
 app.use(express.static("public"));
 app.use(bodyparser.urlencoded({extended:false}))
@@ -77,7 +79,7 @@ app.get('/admin',checkAuthenitcated,async (req,res)=>{
 
 
 // Adding and updating Stocks
-app.post("/", checkAuthenitcated,async (req,res)=>{
+app.post("/",async (req,res)=>{
     // validate user input
     if(!validate_stock_input(req)){
         error = "Invalid Ticker Info";
