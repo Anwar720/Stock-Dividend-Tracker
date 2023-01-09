@@ -10,7 +10,9 @@ import {hourly_Update_Stock_Price,
         update_total_dividends_earned,
         update_user_entered_dividend_dates,
         update_user_entered_total_dividends_earned,
-        check_if_monthly_dividend_payer } from './middleware/update_data.js';
+        check_if_monthly_dividend_payer,
+        setYearlyRecords,
+        setMonthlyDividendRecords  } from './middleware/update_data.js';
 import { register_user,
         login_user } from './middleware/authentication.middleware.js';
 import {verifyJwt,
@@ -51,9 +53,13 @@ app.get("/register",checkNotAuthenticated ,(req,res)=>{
 let error="";
 app.get("/",checkAuthenitcated,async(req,res)=>{
     const {user_id} = verifyJwt(req.cookies['token']);
+    const year = new Date().getFullYear();
+    //get stock data
     const data = await db.query('SELECT  * FROM user_stocks u INNER JOIN stock s ON u.name = s.name WHERE user_id = $1',[user_id]);
-    // console.log(data.rows)
-    res.render('index',{db:data.rows,error});
+    //get dividend records for dividends earned this year
+    const yearly_records = await db.query(`SELECT * FROM yearly_records WHERE user_id = $1 and year = $2`,[user_id,year])
+    
+    res.render('index',{db:data.rows,yearly_records:yearly_records.rows[0],error});
     error="";
 })
 
@@ -71,7 +77,7 @@ app.get('/admin',checkAuthenitcated,async (req,res)=>{
 
 
 // Adding and updating Stocks
-app.post("/", async (req,res)=>{
+app.post("/", checkAuthenitcated,async (req,res)=>{
     // validate user input
     if(!validate_stock_input(req)){
         error = "Invalid Ticker Info";
@@ -159,9 +165,14 @@ app.post("/", async (req,res)=>{
         console.log('yields not found');
         return res.redirect('/');
     }
-
-
 });
+app.post('/get-monthly-dividend-history',checkAuthenitcated, async(req,res)=>{
+    const {user_id} = verifyJwt(req.cookies['token']);
+    //get monthly records for dividend calander
+    const monthly_records = await db.query(`SELECT * FROM monthly_records where user_id = $1 ORDER BY year,EXTRACT(MONTH FROM TO_DATE(month, 'Mon'))`,[user_id]);
+    // console.log(monthly_records.rows)
+    res.send(monthly_records.rows)
+})
 
 
 app.post('/delete',(req,res)=>{
@@ -211,5 +222,7 @@ const monthly_dividend_date_updater = schedule.scheduleJob({date:1,tz:'EST'},mon
 const user_entered_total_dividends_earned_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_user_entered_total_dividends_earned);
 const total_dividends_earned_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_total_dividends_earned);
 const user_entered_dividend_dates_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_user_entered_dividend_dates);
+const setYearlyDividendRecords = schedule.scheduleJob({month:0,hour:0,minute:1,tz:'EST'},setYearlyRecords);
+const setMonthyDividendRecords = schedule.scheduleJob({date:25,hour:0,minute:1,tz:'EST'},setMonthlyDividendRecords);
 
-app.listen(port,()=> `Running on port ${port}`);
+app.listen(port,()=> console.log(`Running on port ${port}`));

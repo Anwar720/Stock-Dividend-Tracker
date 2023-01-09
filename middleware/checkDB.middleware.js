@@ -57,8 +57,4 @@ const insertStockInDb = async (stock_name,res)=>{
 
 };
 
-// db.query(`SELECT * FROM stock`,(err,result)=>{
-//     console.log(result.rows);
-// });
-//check()
 export{checkStockInDb,insertStockInDb}

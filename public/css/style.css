@@ -1,4 +1,11 @@
 @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@200;300&family=Nunito&family=Nunito+Sans&display=swap');
+:root{
+    /* --clr-primary-500:#2d2d2d; */
+    --clr-primary-500:#1f1f1f;
+    --clr-primary-700:rgb(32 33 36);
+    --clr-secondary:rgb(99 191 156);
+    --clr-tertiary-500:rgb(238, 78, 78);
+}
 *{
     padding:0;
     margin:0;
@@ -15,46 +22,96 @@ body{
     transition:0.4s ease-in-out;
 }
 .container{
-    background:rgb(99, 107, 130);
-    width:100vw;
-    padding:1rem;
+    background: rgb(99, 107, 130);
+    width: 100vw;
+    padding: 1rem;
     padding-right: 1.07rem;
     text-align: center;
-    box-shadow: 0 0 10px black ;
-    background-image: linear-gradient(rgb(107, 117, 147) ,rgb(145, 117, 181),rgb(107, 117, 147),#675182f3 ,rgb(107, 117, 147) );
-    /* background-image:linear-gradient(rgb(29, 32, 35),rgb(58, 63, 79) ,rgb(79, 85, 103)); */
+    box-shadow: 0 0 10px black;
+    background: var(--clr-primary-500);
+    /* overflow-x: hidden; */
+}
+/* scroll bar */
+::-webkit-scrollbar {
+    width: 5px;
+}
 
+/* Track */
+::-webkit-scrollbar-track {
+    background: var(--clr-primary-500);
+}
+
+  /* Handle */
+::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.605);
+    border-radius:1rem;
+}
+/* ----- */
+.main-content{
+    width:100%;
+    overflow-x: hidden;
+}
+#linechart{
+    margin: 1.2rem 0;
+    border-radius: 2rem;
+    overflow: hidden;
+    min-height: 20rem;
+    width:100%;
+}
+.chart-controls{
+    width:100%;
+    position:relative
+}
+.chart-control-wrapper{
+    width: 50%;
+    max-width: 24rem;
+    display: grid;
+    grid-template-columns: repeat(4,1fr);
+    gap: 10%;
+    margin: 1rem 0 0 auto;
+    padding: 1rem;
+    position: absolute;
+    z-index: 999;
+    right: 1rem;
+    top: 1rem;
+}
+.chart-control-wrapper input[type="radio"]{
+    display:none;
+}
+.chart-control-wrapper input[type="radio"]:checked + label{
+    background:var(--clr-secondary);
+}
+.chart-control-wrapper label{
+    background: #0e1818;
+    border: none;
+    color: rgb(236, 236, 236);
+    padding: 0.2rem;
+    cursor: pointer;
+    border-radius: 1rem;
 }
 .top-column{
-    background:rgb(86, 95, 114);
-    height:7rem;
-    /* max-height:; */
-    padding:20px 0;
-    padding-left:5px;
-    display:flex;
-    justify-content: space-around;
+    background: var(--clr-primary-700);
+    padding: 20px 0;
+    padding-left: 5px;
     align-items: center;
-    border-bottom: 2px solid white;
-    box-shadow:0 0 5px black;
-    padding-right:1rem;
-    border-radius:10px;
+    border-bottom: 2px solid black;
+    padding-right: 1rem;
+    border-radius: 10px 10px 0 0;
+    display: grid;
+    grid-template-columns: repeat(7,1fr) 1rem;
+    place-items: center;
 }
-
 .inventory{
-    background:rgb(99, 112, 139);
-    padding:20px 0;
-    padding-left:5px;
-    display:flex;
-    justify-content: space-around;
-    align-items: center;
-    /* border-bottom: 2px solid rgb(247, 247, 248); */
-    padding-right:1rem;
-    box-shadow:0 -5px 5px rgb(56, 58, 87),
-                0 -10px 5px rgb(83, 86, 129),
-                5px 0 5px rgb(56, 58, 87),
-                0 -5px 5px black;
-    border-radius:10px;
-    height:5rem;
+    padding: 20px 0;
+    padding-left: 5px;
+    padding-right: 1rem;
+    height: 4.3rem;
+    border-bottom: 2px solid black;
+    background: linear-gradient(94deg, #1e1414cc, #57ac8c29);
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(7,1fr) 1rem;
+    place-items: center;
 }
 
 .inventory > div,.top-column > div{
@@ -64,32 +121,57 @@ body{
     min-inline-size: 10%; 
     inline-size: 45px;
 }
+.carrot-top{
+    position: absolute;
+    bottom: 95%;
+    right: 15%;
+    transform: scale(2);
+    color: black;
+}
+.inventory input[type="checkbox"] + label  .controls{
+    border-radius: 5px;
+    position: absolute;
+    right: -1.1rem;
+    top: 2rem;
+    background: rgba(0, 0, 0, 0.739);
+    transition: 0.5s ease;
+    z-index: 50;
+    transform: translateX(20rem);
+    transition: 0.2s ease;
+    display: grid;
+    grid-template-columns: 1fr;
+    padding: 0.7rem;
+    color: white;
+    opacity: 0;
+    place-items: center;
+}
 
+.action-label{
+    position:relative;
+}
 
+.inventory input[type="checkbox"]:checked + label  .controls{
+    transform: translateX(0);
+    opacity: 1;
+}
 .add{
     width: 80%;
     max-width: 50rem;
-    height:2.57rem;
-    margin:10px 0;
-    background:rgb(131, 144, 184);
-    color:white;
-    font-size:1.2rem;
-    cursor:pointer;
+    height: 2.57rem;
+    margin: 10px 0;
+    background: var(--clr-secondary);
+    color: white;
+    font-size: 1.2rem;
+    cursor: pointer;
     border-radius: 10px;
     text-align: center;
-    padding:2px 7px;
-    box-shadow: 1px 1px 5px inset rgb(204, 216, 223),
-                -1px -1px 3px inset black,
-                3px 3px 14px black;
+    padding: 2px 7px;
 }
 .add-data{
-    /* height:15rem; */
-    height:19rem;
-    background-color: rgb(107, 117, 147);
-    padding:10px;
+    height: 19rem;
+    padding: 10px;
     text-align: center;
-    display:none;
-    box-shadow: 0 0  8px black;
+    display: none;
     z-index: 999;
 }
 #submit{
@@ -98,40 +180,36 @@ body{
 .stock-data input{
     width: 77%;
     max-width: 50rem;
-    height:2rem;
-    display:flex;
+    height: 2rem;
+    display: flex;
     flex-direction: column;
-    padding:2px 7px;
-    gap:10px;
-    margin:auto;
-    background:rgb(91, 98, 110);
-    color:white;
-    font-size:1.09rem;
-    text-align:center;
+    padding: 2px 7px;
+    gap: 10px;
+    margin: auto;
+    background: rgb(23 23 23 / 81%);
+    color: white;
+    font-size: 1.09rem;
+    text-align: center;
     align-self: center;
-    margin-top:10px;
-    margin-bottom:1.5rem;
+    margin-top: 10px;
+    margin-bottom: 1.5rem;
+    border: none;
 }
+
 .optional{
     color:rgb(182, 191, 195);
 }
 
 .results{
-    background:rgb(86, 95, 114);
-    border-radius: 10px;
-    min-height:6rem;
-    display:flex;
+    background: rgb(35 35 36);
+    border-radius: 0 0 10px 10px;
+    min-height: 6rem;
+    display: flex;
     flex-direction: row;
     justify-content: space-around;
     align-items: center;
-    margin:0 0  1rem 0;
-    /* box-shadow: 4px -3px 8px rgb(51, 46, 60),
-                2px -2px 3px inset rgb(126, 157, 197); */
-    box-shadow: 2px -2px 5px inset rgb(126, 157, 197),
-    0 -5px 5px rgb(56, 58, 87),
-    0 -10px 5px rgb(83, 86, 129),
-    5px 0 5px rgb(56, 58, 87),
-    0 -5px 5px black;;
+    margin: 0 0  1rem 0;
+    
 }
 
 input[type="date"]::-webkit-calendar-picker-indicator {
@@ -157,47 +235,45 @@ input[type="date"]{
     left:90%;
     cursor:pointer;
 }
+.options{
+    cursor:pointer;
+}
 i{
-    font-size:10px;
+    font-size:inherit;
     color:white;
     background:transparent;
+}
+.controls button{
+    width:100%;
+    display:grid;
+    grid-template-columns: auto 1fr;
+    color:white;
+    font-size: 1rem;
+    padding:0.5rem;
+}
+.controls button:hover{
+    background: #33403b;
 }
 .delete {
     align-items: center;
     border:none;
-    display:none;
     background:transparent;
-    transform:scale(2.1);
     cursor:pointer;
     flex:0;
-    color:rgb(243, 76, 76); 
     margin:7px;
 }
-.delete i{
-    color:rgb(239, 22, 22); 
-    font-size: 11px;
-    text-shadow: 0 0 2px rgb(85, 36, 36);
-}
+
 .delete i:hover{
     text-shadow: 0 0 1px rgb(159, 55, 55);
 }
 .edit{
     align-items: center;
     border:none;
-    display:none;
-    background:rgba(160, 245, 171, 0.636);
     background:transparent;
     margin:5px;
-    transform:scale(2.1);
     cursor:pointer;
-    flex:0;
 }
-.edit i{
-    color:rgb(123, 242, 139);
-    font-size: 12px;
-    /* text-shadow: 0 0 1px rgb(185, 245, 193); */
-    text-shadow: 0 0 1px rgb(66, 100, 71);
-}
+
 .edit i:hover{
     text-shadow: 0 0 0.5px rgb(245, 247, 245);
 
@@ -211,22 +287,12 @@ i{
     height:100%;
     border-radius: 10px;
 }
-.controls{
-    width:4.5rem;
-    max-width:10%;
-    flex-shrink: 7;
-    box-shadow: -3px 3px 5px inset rgb(35, 34, 51),
-                1px 1px 5px inset white;
-                border-radius:5px;
-}
 
 .space{
     width:3.1rem;
     flex-shrink: 7;
 }
 .title{
-    background-image: linear-gradient(60deg,rgb(107, 117, 147) ,rgb(123, 134, 170),#59a1a8f3 ,rgb(107, 125, 147),rgb(107, 117, 147));
-    /* height:2.6rem; */
     color: rgba(80, 244, 176, 0.848);
     border-radius: 10px;
     padding:5px;
@@ -252,7 +318,6 @@ i{
     margin-bottom:5px;
     padding:10px 5px;
     border-radius:8px;
-
 }
 .cover{
     position:fixed;
@@ -297,23 +362,21 @@ i{
 } 
 #bar_graph{
     height:30rem;
-    /* padding:10px 0 ; */
 }
 .compound_calculator{
-    padding:25px 10px ;
-    height:14rem;
-    background-color:rgba(99, 112, 139, 0.687) ;
+    padding: 25px 10px;
+    height: 14rem;
     display: flex;
     flex-direction: column;
     justify-content: space-around;
-    box-shadow: 0px 2px 10px inset rgb(48, 23, 58);
 }
 .annual_input input[type=number]{
-    border-radius:10px;
-    padding:5px 10px;
-    background:rgb(70, 78, 96);
-    color:white;
-    margin:5px;
+        /* border-radius: 10px; */
+        padding: 5px 10px;
+        background: rgb(0 0 0);
+        color: white;
+        margin: 5px;
+        border: none;
 }
 select{
     padding:2px 5px;
@@ -349,7 +412,7 @@ select{
     min-height:2.5rem;
     min-width:3rem;
     padding:1vw;
-    background:rgb(238, 78, 78);
+    background:var(--clr-tertiary-500);
     cursor:pointer;
     color:white;
     border-radius:10px;
@@ -370,30 +433,27 @@ select{
 
 /* ------------ Dividend Calander section ----------- */
 .dividend_calander{
-    width:100%;
-    height:max-content;
-    /* background:rgb(83, 92, 139); */
-    background:rgba(99, 112, 139, 0.687);
+    width: 100%;
+    height: max-content;
     border-radius: 10px 10px 0 0;
-    display:flex;
+    display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
-    padding:1rem;
-    box-shadow:0 0 6px  rgb(48 23 58)
+    padding: 1rem;
+    background-color: #232324;
 }
 .calander_data{
-    width:95%;
-    height:4.7rem;
+    width: 95%;
+    height: 4.7rem;
     border-radius: 10px;
-    background-color: rgb(99, 112, 139);
-    display:flex;
+    display: flex;
     justify-content: space-evenly;
     align-items: center;
-    margin:5px;
+    margin: 5px;
     position: relative;
-    box-shadow: 4px -3px 8px rgb(51, 46, 60),
-                2px -2px 3px inset rgb(126, 157, 197);
+    background: linear-gradient(94deg, #1e1414cc, #57ac8c29);
+    border: 2px solid #1e3a1e;
 }
 .calander_data > section{
     width: 4.5rem;
@@ -415,6 +475,10 @@ select{
 
 .calander-icon i{
     font-size: 1.3rem;
+}
+.month-total{
+    margin: 2rem 10% 2rem auto;
+    float: right;
 }
 /*------- authentication pages--------- */
 

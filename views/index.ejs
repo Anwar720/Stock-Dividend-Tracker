@@ -17,7 +17,15 @@
             </span>
     
         </h1>
-        <!-- <div id="piechart_3d"></div> -->
+        <div class="chart-controls">
+                <div class="chart-control-wrapper">
+                    <input type="radio" onclick="drawLineChart(getDataForTimespan(3))" name="chart-date" id="chart-date-3m"><label for="chart-date-3m">3M</label>
+                    <input type="radio" onclick="drawLineChart(getDataForTimespan(6))" name="chart-date" checked id="chart-date-6m"><label for="chart-date-6m">6M</label>
+                    <input type="radio" onclick="drawLineChart(getDataForTimespan(12))" name="chart-date" id="chart-date-1y"><label for="chart-date-1y">1Y</label>
+                    <input type="radio" onclick="drawLineChart(getDataForTimespan(100))" name="chart-date" id="chart-date-all"><label for="chart-date-all">All</label>
+                </div>
+            </div>
+        <div id="linechart"></div>
 
         <div class="top_buttons">
             <form action="/user/logout" method="post" class="logout"><button type="submit"  title="logout"><i class="fas fa-sign-out-alt"></i></button></form>
@@ -37,48 +45,55 @@
             <p id="error"></p>
             <input type="submit" id="submit" class="add">
         </form>
-        <div class="top-column">
-            <div class="ticker">Ticker Symbol </div>
-            <div class="price">Price</div>
-            <div class="quantity">Quantity</div>
-            <div class="quantity">Yield Percent</div>
-            <div class="yield">Annual<br/> Yield</div>
-            <div class="yield">Dividends Recieved</div>
-            <div class="total" title="Expected Annual Dividend">Expected Annual Dividend</div>
-            <span class="space"></span>
+        <div class="main-content">
+            <div class="top-column">
+                <div class="ticker">Ticker </div>
+                <div class="price">Price</div>
+                <div class="quantity">Quantity</div>
+                <div class="quantity">Yield %</div>
+                <div class="yield">Annual<br/> Yield</div>
+                <div class="yield">$ Recieved</div>
+                <div class="total" title="Expected Annual Dividend">$  Annual</div>
+                <span class="space"></span>
             
-        </div>
-        <div id="stock_list">
-            <%let totalSum = 0; %>
-            <%let totalCash = 0; %>
-            <%let dividends_earned = 0; %>
+            </div>
+            <div id="stock_list">
+                <%let totalSum = 0; %>
+                <%let totalCash = 0; %>
+                <%let dividends_earned = 0; %>
             
             
-            <% for( var i = 0; i < db.length; i++){ %>
-                    <div class="inventory">
-                        <div class="stock-ticker inv-field stock_name"><%= db[i].name %></div>
-                        <div class="stock-price inv-field ">$<%=db[i].price.toFixed(2)%></div>
-                        <div class="stock-quantity inv-field"><%= db[i].quantity.toFixed(3).replace(/0{0,2}$/, ""); %></div>
-                        <div class="stock-quantity inv-field"><%=  (db[i].yield/parseFloat(db[i].price)*100).toFixed(2) %>%</div>
-                        <div class="stock-yield inv-field">$<%= db[i].yield.toFixed(2) || '0.00'%></div>
-                        <div class="stock-yield inv-field">$<%=db[i].total_dividends_earned.toFixed(2)%></div>
-                        <div class="stock-total inv-field">$<%= db[i].total.toFixed(2) || '0.00' %></div>
-                        <span class="controls">
-                        <button data-id='<%= db[i].id %>' title="Delete" class="delete" ><i class="fas fa-trash-alt"></i></button>
-                        <button data-id='<%= db[i].id %>'title="Edit" class="edit" ><i class="fas fa-pen-square"></i></button>
-                        </span>
-                        <%totalSum += db[i].total %> 
-                        <%totalCash += (parseFloat(db[i].price)*db[i].quantity)%>
-                        <%dividends_earned += (parseFloat(db[i].total_dividends_earned))%>
-                        
+                <% for( var i = 0; i < db.length; i++){ %>
+                        <div class="inventory">
+                            <div class="stock-ticker inv-field stock_name"><%= db[i].name %></div>
+                            <div class="stock-price inv-field ">$<%=db[i].price.toFixed(2)%></div>
+                            <div class="stock-quantity inv-field"><%= db[i].quantity.toFixed(3).replace(/0{0,2}$/, ""); %></div>
+                            <div class="stock-quantity inv-field"><%=  (db[i].yield/parseFloat(db[i].price)*100).toFixed(2) %>%</div>
+                            <div class="stock-yield inv-field">$<%= db[i].yield.toFixed(2) || '0.00'%></div>
+                            <div class="stock-yield inv-field">$<%=db[i].total_dividends_earned.toFixed(2)%></div>
+                            <div class="stock-total inv-field">$<%= db[i].total.toFixed(2) || '0.00' %></div>
+                            <input type="checkbox" id="option<%=i%>" style="display:none;">
+                            <label  class="action-label" tabindex="<%=i%>"  onblur="setUnchecked(this)" for="option<%=i%>" ><i class="options fas fa-ellipsis-v"></i></i>
+                                <span class="controls" tabindex="<%=i%>" onclick="(e)=>e.stopPropagation();" >
+                                    <i class="carrot-top fas fa-caret-up"></i>
+                                    <button data-id='<%= db[i].id %>' data-name='<%= db[i].name%>' data-quantity='<%= db[i].quantity.toFixed(3).replace(/0{0,2}$/, "")%>'
+                                        title="Edit" class="edit" ><i class="fas fa-pen-square"></i> <p>Edit</p></button>
+                                    <button data-id='<%= db[i].id %>' title="Delete" class="delete" ><i class="fas fa-trash-alt"></i> <p>Delete</p></button>
+                                </span>
+                            </label>
+                            
+                            <%totalSum += db[i].total %>
+                            <%totalCash += (parseFloat(db[i].price)*db[i].quantity)%>
+                            <%dividends_earned += (parseFloat(db[i].total_dividends_earned))%>
+                        </div>
+                    <% } %>
+                    <div class="results">
+                        <!-- changing this will affect bar graph data -->
+                        <h2 class="sum dividend_rate">Annual Dividend Rate: <%= ((totalSum/totalCash*100).toFixed(2) > 0)?(totalSum/totalCash*100).toFixed(2):0 %>%</h2>
+                        <h2 class="sum expected_income">Annual Dividend Income:  $<%=parseFloat((totalSum).toFixed(2))%><div class="bar"><div class="fill" data-fill="<%= ((yearly_records.total_dividends || 0)/parseFloat((totalSum).toFixed(2)) * 100).toFixed(2)  %>%"></div></div></h2>
+                        <h2 class="sum">Dividends Earned:  $<%= dividends_earned.toFixed(2) %> </h2>
                     </div>
-                <% } %>
-                <div class="results">
-                    <!-- changing this will affect bar graph data -->
-                    <h2 class="sum dividend_rate">Annual Dividend Rate: <%= ((totalSum/totalCash*100).toFixed(2) > 0)?(totalSum/totalCash*100).toFixed(2):0 %>%</h2>
-                    <h2 class="sum expected_income">Annual Dividend Income:  $<%=parseFloat((totalSum).toFixed(2))%><div class="bar"><div class="fill" data-fill="<%= (dividends_earned/parseFloat((totalSum).toFixed(2)) * 100).toFixed(2)  %>%"></div></div></h2>
-                    <h2 class="sum">Dividends Earned:  $<%= dividends_earned.toFixed(2) %> </h2>
-                </div>
+            </div>
         </div>
         
         <%- include('dividend_calander') -%>
@@ -118,13 +133,12 @@
         </div>
         <div id="bar_graph"></div>
         <div class="footer">
-            Copyright <i class="fas fa-copyright"></i> 2022 Anwar Jahid
+            <!-- Copyright <i class="fas fa-copyright"></i> 2022 Anwar Jahid -->
         </div>
     </div>
     
     <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
     <script src="/js/script.js"></script>
-
 
 </body>
 </html>

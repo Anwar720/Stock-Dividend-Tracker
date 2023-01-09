@@ -27,7 +27,7 @@ remove.forEach((button)=> button.addEventListener('click',async ()=>{
     let cancel_btn = document.querySelector('.cancel_delete');
     let remove_btn = document.querySelector('.verify_delete');
     let stock_name = document.querySelector('.delete_stock_name');
-    stock_name.innerText = button.parentElement.parentElement.firstElementChild.innerText;
+    stock_name.innerText = button.parentElement.querySelector('.edit').getAttribute('data-name');
     delete_Box.style.display = 'grid';
     cancel_btn.addEventListener('click',()=>{
         console.log('clicked cancel');
@@ -46,6 +46,12 @@ remove.forEach((button)=> button.addEventListener('click',async ()=>{
         });
     })
 }))
+
+//on blur function to uncheck chekbox and hide action menu
+function setUnchecked(element){
+    if (!event.currentTarget.contains(event.relatedTarget))
+        element.parentElement.querySelector('input[type="checkbox"]').checked = false
+}
 //displaying delete confirm 
 const delete_confirm  = ()=>{
     let delete_Box = document.querySelector('.delete_confirm');
@@ -76,15 +82,15 @@ x.addEventListener('click',()=>{
 let edit = [...document.getElementsByClassName('edit')];
 edit.forEach((button)=> button.addEventListener('click',()=>{
     let id = button.getAttribute('data-id');
-    let name = document.getElementById('stock_name');
-    let quantity = document.getElementById('stock_quantity');
+    let name = button.getAttribute('data-name')
+    let quantity = button.getAttribute('data-quantity')
     let givenId = document.getElementById('given_id');
+    //display add stock form 
     showAddMenu();
-    let parent = button.parentElement.parentElement;
-    name.value = parent.firstElementChild.innerHTML;
-    quantity.value = parent.children[2].innerHTML;
-    givenId.value = parseInt(id);
-    console.log(id,'parent is:',parent,'first:',parent.children[0].innerHTML)
+    let addForm = document.querySelector('#add-data');
+    addForm.querySelector('#stock_name').value = name
+    addForm.querySelector('#stock_quantity').value = quantity
+    addForm.querySelector('#given_id').value = parseInt(id)
 }));
 
 // clear the add stock inputs
@@ -97,12 +103,6 @@ const clear = ()=>{
 
 // hover display of edit and delete
 const rows = [...document.getElementsByClassName('inventory')];
-rows.forEach(item => item.addEventListener('mouseenter',()=>{
-    change_Edit_Delete_Display(item,'inline-block','5px');
-}))
-rows.forEach(item => item.addEventListener('mouseleave',()=>{
-    change_Edit_Delete_Display(item,'none',0);
-}))
 
 const change_Edit_Delete_Display = (item,value,padding) =>{
     item.lastElementChild.style.padding = padding;
@@ -117,11 +117,6 @@ bar_fill.style.width = bar_fill.dataset.fill;
 bar_fill.title = bar_fill.dataset.fill;
 
 
-// adjusting bargraph size
-window.addEventListener('resize', function(){
-    drawPieGraph();
-    drawBarGraph();
-});
 
 
 // <---------------- Google Charts -------------------->
@@ -144,6 +139,13 @@ let arr = [document.getElementById('piechart_3d').dataset.arr];
         var options = {
             title: 'Dividend Portfolio',
             is3D: true,
+            backgroundColor: '#232324',
+            titleTextStyle: {
+                color: '#FFF'
+            },
+            legend: {textStyle: {color: 'white'}}
+            // colors: ['#82ccb0','#73c5a6','#63bf9c','#59ac8c','#4f997d','#45866d','#3b735e','#32604e','#284c3e','#1e392f'],
+            // colors:['#a1d9c4','#b1dfce','#c1e5d7','#d0ece1','#e0f2eb','#63bf9c','#59ac8c','#4f997d','#45866d']
         };
         //document.getElementById('piechart_3d').style.transition = '3s ease-in-out';
         var chart = new google.visualization.PieChart(document.getElementById('piechart_3d'));
@@ -176,7 +178,15 @@ drawPieGraph();
         }
         // console.log('total yield is',yield+returns,contribution);
         var data = google.visualization.arrayToDataTable(yearly_data);
-        var options = {title: 'Annual Dividend with Reinvestment'}; 
+        var options = {
+            title: 'Annual Dividend with Reinvestment',
+            backgroundColor: '#232324',
+            titleTextStyle: {
+                color: '#FFF'
+            },
+            colors: ['#32604e','#63bf9c'],
+            legend: {textStyle: {color: 'white'}}
+        }
 
         // Instantiate and draw the chart.
         var chart = new google.visualization.ColumnChart(document.querySelector('#bar_graph'));
@@ -189,3 +199,88 @@ drawPieGraph();
     google.charts.setOnLoadCallback(drawChart2);
 }
 drawBarGraph();
+
+
+//draw line chart for dividends earned
+function drawLineChart(record=getDataForTimespan()){
+    google.charts.load('current', {packages: ['corechart']});
+    google.charts.setOnLoadCallback(drawBackgroundColor);
+
+function drawBackgroundColor() {
+    var data = new google.visualization.DataTable();
+    data.addColumn('number', 'X');
+    data.addColumn('number', 'Dogs');
+    var data = google.visualization.arrayToDataTable(record);
+
+    var options = {
+        title: 'Dividends Earned',
+        titleTextStyle: {
+            color: '#FFF'
+        },
+        hAxis: {
+            textStyle:{color: '#FFF'},
+            gridlines: {
+                color: 'none'
+            },
+        },
+        vAxis: {
+            textStyle:{color: '#FFF'},
+            gridlines: {
+                color: 'none'
+            },
+            viewWindow:{
+                min:-1
+            }
+        },
+        selectionMode: 'multiple',
+        animation: {
+            duration: 500,
+            easing: 'inAndOut',
+            startup: true
+        },
+        series: {
+            0: { lineWidth: 3.5 }
+        },
+        colors: ['#63bf9c'],
+        curveType: 'function',
+        backgroundColor: '#232324',
+        enableInteractivity: true,
+        legend: {position: 'none'},
+        height: 400
+    };
+
+    var chart = new google.visualization.LineChart(document.getElementById('linechart'));
+    chart.draw(data, options);
+    }
+}
+
+let monthly_record = [['Month', 'Dividends']]
+// fetch line chart data
+window.onload = async ()=>{
+    await fetch('/get-monthly-dividend-history',{method:'POST'}).then(res=>res.json()).then(record=>{
+        if(record){
+            record.forEach(stock=>{
+                //format data for chart
+                monthly_record.push([`${stock.month}-${stock.year}`,stock.total_dividends])
+            })
+            drawLineChart();
+        }
+    })
+}
+//filter to get stocks that are in range to timespan
+// format for chart -> [
+    //     ['Month', 'Dividends'],
+    //     ['Jan-2022',  100],
+    // ]
+function getDataForTimespan(timespan = 6){
+    if(timespan == 100) return monthly_record;
+    let numOfMonths = monthly_record.length
+    return monthly_record.filter((stock,idx)=> idx == 0 || idx >= Math.ceil(numOfMonths - timespan))
+}
+
+// adjusting bargraph size
+window.addEventListener('resize', function(){
+    drawPieGraph();
+    drawBarGraph();
+    drawLineChart()
+});
