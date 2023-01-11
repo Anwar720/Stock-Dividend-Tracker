@@ -117,8 +117,133 @@ bar_fill.style.width = bar_fill.dataset.fill;
 bar_fill.title = bar_fill.dataset.fill;
 
 
+// dividend calander functions
+const month_element = document.querySelector('.calander-controls .month');
+let calander_container = document.querySelector('.calander-container');
+let next_month_btn = document.querySelector('.next i');
+let previous_month_btn = document.querySelector('.prev i');
+let currentYear = new Date().getFullYear()
+let all_monthly_data = []
+let calander_element_list = []
+let current_month_index = 0
 
+const setFullMonthString = ()=>{
+    let Mon = month_element.getAttribute('data-month')
+    let year = month_element.getAttribute('data-year') 
+    let month = new Date(Mon + ' '+ year).toLocaleString('en-us',{month:'long'})
+    month = year == currentYear?month: `${month} - ${year}`
+    month_element.innerText = month;
+}
+window.addEventListener('load',()=>{
+    setFullMonthString()
+})
 
+const displayCalanderForMonth = (month,year,direction='')=>{
+    console.log(month,year,month_element)
+    calander_element_list.forEach(item=>{
+        let dateMatched = item.getAttribute("data-month") == month && item.getAttribute("data-year") == year
+        if(dateMatched){
+            month_element.dataset.month = month
+            month_element.dataset.year = year
+            setFullMonthString()
+            item.classList.add('show',direction)
+        }
+        else
+            item.classList.remove('show','transition-left','transition-right')
+    })
+}
+//next month event
+next_month_btn.addEventListener('click',()=>{
+    if(current_month_index == calander_element_list.length-1) return 
+    else {
+            current_month_index++
+            console.log(current_month_index)
+            let month = calander_element_list[current_month_index].getAttribute('data-month')
+            let year = calander_element_list[current_month_index].getAttribute('data-year')
+            displayCalanderForMonth(month,year,'transition-left')
+        }
+})
+//previous month event
+previous_month_btn.addEventListener('click',()=>{
+    if(current_month_index == 0) return 
+    else {
+            current_month_index--
+            let month = calander_element_list[current_month_index].getAttribute('data-month')
+            let year = calander_element_list[current_month_index].getAttribute('data-year')
+            displayCalanderForMonth(month,year,'transition-right')
+        }
+})
+
+const createDividendCalander = ()=>{
+    if(!all_monthly_data) return calander_element_list.push(document.querySelector('.calander_data_wrapper'))
+    all_monthly_data.forEach(month=>{
+        let wrapper = document.createElement('div');
+        wrapper.classList.add('calander_data_wrapper')
+        wrapper.setAttribute('data-month',month.month)
+        wrapper.setAttribute('data-year',month.year)
+        // fill with dividend payment dates
+        Object.values(month.stock_list).forEach(stock=>{
+            let stock_card = document.createElement('div')
+            stock_card.classList.add('calander_data')
+                stock_card.appendChild(Object.assign(document.createElement('div'),{className:'dividend_date',textContent:stock.dividenddate})); // dividend date
+                stock_card.appendChild(document.createElement('section')); 
+                stock_card.appendChild(Object.assign(document.createElement('section'),{textContent:stock.name}))
+                stock_card.appendChild(Object.assign(document.createElement('section'),{textContent:stock.dividend_per_share.toFixed(2)}))
+                stock_card.appendChild(Object.assign(document.createElement('section'),{textContent:stock.expected_dividends.toFixed(2)}))
+            wrapper.appendChild(stock_card)
+        })
+        wrapper.appendChild(Object.assign(document.createElement('h3'),{className:'month-total',textContent:`Total Dividends: ${month.total_dividends.toFixed(2)}`})) // month total dividends
+        calander_element_list.push(wrapper);
+        calander_container.appendChild(wrapper);
+        })
+        //pushing the month that was already rendered by server
+        calander_element_list.push(document.querySelector('.calander_data_wrapper'))
+}
+// retrieving dividend monthly data
+let monthly_record = [['Month', 'Dividends']]
+
+// fetch line chart data
+window.onload = async ()=>{
+    await fetch('/get-monthly-dividend-history',{method:'POST'}).then(res=>res.json()).then(record=>{
+        if(record){
+            record.forEach(stock=>{
+                let date = new Date()
+                let month = date.toString().substring(4,7);
+                let year = date.getFullYear()
+                // console.log(stock);
+                if(stock.month != month && year != stock.year){
+                    all_monthly_data.push(stock)
+                    current_month_index++
+                }
+                //format data for chart
+                monthly_record.push([`${stock.month}-${stock.year}`,stock.total_dividends])
+            })
+            drawLineChart();
+            createDividendCalander()
+        }
+    })
+}
+//filter to get stocks that are in range to timespan
+// format for chart -> [
+    //     ['Month', 'Dividends'],
+    //     ['Jan-2022',  100],
+    // ]
+function getDataForTimespan(timespan = 6){
+    if(timespan == 100) return monthly_record;
+    let numOfMonths = monthly_record.length
+    if(numOfMonths < 2) return monthly_record.push([`${new Date(new Date().setMonth(new Date().getMonth() - 1)).toString().substring(4,7)}-${new Date().getFullYear()}`,0]);
+    return monthly_record.filter((stock,idx)=> idx == 0 || idx >= Math.ceil(numOfMonths - timespan))
+}
+let width = window.innerWidth
+// adjusting bargraph size
+window.addEventListener('resize', function(e){
+    if(width !== window.innerWidth){
+        drawPieGraph();
+        drawBarGraph();
+        drawLineChart()
+        width = window.innerWidth
+    }
+});
 // <---------------- Google Charts -------------------->
 // Pie Graph
 const drawPieGraph = ()=>{
@@ -254,34 +379,3 @@ function drawBackgroundColor() {
     }
 }
 
-let monthly_record = [['Month', 'Dividends']]
-// fetch line chart data
-window.onload = async ()=>{
-    await fetch('/get-monthly-dividend-history',{method:'POST'}).then(res=>res.json()).then(record=>{
-        if(record){
-            record.forEach(stock=>{
-                //format data for chart
-                monthly_record.push([`${stock.month}-${stock.year}`,stock.total_dividends])
-            })
-            drawLineChart();
-        }
-    })
-}
-//filter to get stocks that are in range to timespan
-// format for chart -> [
-    //     ['Month', 'Dividends'],
-    //     ['Jan-2022',  100],
-    // ]
-function getDataForTimespan(timespan = 6){
-    if(timespan == 100) return monthly_record;
-    let numOfMonths = monthly_record.length
-    if(numOfMonths < 2) return monthly_record.push([`${new Date(new Date().setMonth(new Date().getMonth() - 1)).toString().substring(4,7)}-${new Date().getFullYear()}`,0]);
-    return monthly_record.filter((stock,idx)=> idx == 0 || idx >= Math.ceil(numOfMonths - timespan))
-}
-
-// adjusting bargraph size
-window.addEventListener('resize', function(){
-    drawPieGraph();
-    drawBarGraph();
-    drawLineChart()
-});

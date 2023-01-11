@@ -6,13 +6,15 @@ import cookieParser from 'cookie-parser';
 import {db} from './model/DBconnection.js';
 import schedule from 'node-schedule';
 import {hourly_Update_Stock_Price,
-        monthly_update_dividend_data,
+        update_yahoo_dividend_dates ,
         update_total_dividends_earned,
         update_user_entered_dividend_dates,
         update_user_entered_total_dividends_earned,
         check_if_monthly_dividend_payer,
         setYearlyRecords,
-        setMonthlyDividendRecords  } from './middleware/update_data.js';
+        setMonthlyDividendRecords,
+        updateDividendDatesNotInYahoo,
+        updateSingleDateAndDateListNotInYahoo   } from './middleware/update_data.js';
 import { register_user,
         login_user } from './middleware/authentication.middleware.js';
 import {verifyJwt,
@@ -23,6 +25,7 @@ import {Validation,
 import {checkStockInDb} from './middleware/checkDB.middleware.js'
 import {check} from 'express-validator';
 import { scheduleJob } from 'node-schedule';
+import {getStockInfoFromWeb} from './middleware/scraping.js'
 
 const app = express();
 const port = process.env.PORT || 3000;
@@ -31,8 +34,6 @@ process.on('uncaughtException', (error)  => {
     console.log('🔥🚀Alert! ERROR : ',  error);
     process.exit(1);
 })
-
-//https://dividendhistory.org/payout/SPHD/
 
 app.set('view engine','ejs');
 app.use(express.static("public"));
@@ -52,6 +53,7 @@ app.get("/register",checkNotAuthenticated ,(req,res)=>{
     registerError=''
 })
 
+// render home page
 let error="";
 app.get("/",checkAuthenitcated,async(req,res)=>{
     const {user_id} = verifyJwt(req.cookies['token']);
@@ -60,7 +62,8 @@ app.get("/",checkAuthenitcated,async(req,res)=>{
     const data = await db.query('SELECT  * FROM user_stocks u INNER JOIN stock s ON u.name = s.name WHERE user_id = $1',[user_id]);
     //get dividend records for dividends earned this year
     const yearly_records = await db.query(`SELECT * FROM yearly_records WHERE user_id = $1 and year = $2`,[user_id,year])
-    
+
+    // console.log(data.rows)
     res.render('index',{db:data.rows,yearly_records:yearly_records.rows[0],error});
     error="";
 })
@@ -115,13 +118,16 @@ app.post("/",async (req,res)=>{
                 yields = parseFloat((yields).toFixed(3));
             let monthly_payer = await check_if_monthly_dividend_payer(stock_name);
             let dividend_amount = (monthly_payer)?yields/12:yields/4;
-                console.log('line 92:',stock_name,monthly_payer,dividend_amount);
+            let is_date_in_yahoo = dividendDate.length > 0
             // Inserting new Stock data to stock db
-            const insert = `INSERT INTO stock(name,price,yield,dividendDate,monthly_payer,dividend_amount) VALUES ($1,$2,$3,$4,$5,$6)`;
-            const data = [stock_name.toUpperCase(),price,yields,dividendDate,monthly_payer,dividend_amount];
-            db.query(insert,data ,(err,result)=>{
+            const insert = `INSERT INTO stock(name,price,yield,dividendDate,monthly_payer,dividend_amount,is_date_in_yahoo) VALUES ($1,$2,$3,$4,$5,$6,$7)`;
+            const data = [stock_name.toUpperCase(),price,yields,dividendDate,monthly_payer,dividend_amount,is_date_in_yahoo];
+            db.query(insert,data ,async (err,result)=>{
                 if(result){
                     console.log('successful insert: ');
+                    // update dividend date if not available already
+                    if(dividendDate == '')
+                        await updateSingleDateAndDateListNotInYahoo(stock_name.toUpperCase())
                 }
                 // send error message
                 if(err){
@@ -129,6 +135,7 @@ app.post("/",async (req,res)=>{
                     return res.redirect('/');
                 }
             });
+            
         };
 
 
@@ -218,12 +225,12 @@ app.post('/user/logout',(req,res)=>{
     res.clearCookie("token");
     res.redirect('/login');
 })
-
 const hourly_price_updater = schedule.scheduleJob({minute:30,tz:'EST'},hourly_Update_Stock_Price);
-const monthly_dividend_date_updater = schedule.scheduleJob({date:1,tz:'EST'},monthly_update_dividend_data);
-const user_entered_total_dividends_earned_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_user_entered_total_dividends_earned);
+const weekly_dividend_date_updater = schedule.scheduleJob({dayOfWeek:0,tz:'EST'},update_yahoo_dividend_dates );
+const update_yahoo_dividend_dates_on_1st_day_of_month = schedule.scheduleJob({date:1,hour:7,tz:'EST'},update_yahoo_dividend_dates);
+// const user_entered_total_dividends_earned_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_user_entered_total_dividends_earned);
 const total_dividends_earned_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_total_dividends_earned);
-const user_entered_dividend_dates_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_user_entered_dividend_dates);
+const updating_dividend_dates_not_in_yahoo = schedule.scheduleJob({dayOfWeek:0,hour:7,tz:'EST'},updateDividendDatesNotInYahoo);
 const setYearlyDividendRecords = schedule.scheduleJob({month:0,hour:0,minute:1,tz:'EST'},setYearlyRecords);
 const setMonthyDividendRecords = schedule.scheduleJob({date:25,hour:0,minute:1,tz:'EST'},setMonthlyDividendRecords);
 

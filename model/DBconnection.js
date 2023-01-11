@@ -88,23 +88,26 @@ db.connect((err,res)=>{
 
 // ------******************Additional Table Alters******************--------
 // db.query(`ALTER TABLE stock ADD COLUMN monthly_payer boolean`)
+// db.query(`ALTER TABLE stock ADD COLUMN is_date_in_yahoo boolean DEFAULT false`)
+// db.query(`ALTER TABLE stock ADD COLUMN date_list TEXT ARRAY DEFAULT ARRAY[]::varchar[] `)
 // db.query(`ALTER TABLE user_stocks ADD COLUMN this_years_dividends FLOAT DEFAULT 0.00`)
+// db.query(`ALTER TABLE user_stocks ADD COLUMN dividend_dates JSON ARRAY`)
 // db.query(`ALTER TABLE user_stocks ADD COLUMN total_dividends_earned float`)
 // db.query(`ALTER TABLE user_stocks ALTER COLUMN total_dividends_earned SET DEFAULT 0.00`)
 // db.query(`ALTER TABLE user_stocks ADD COLUMN user_dividend_date TEXT`)
 // db.query(`ALTER TABLE yearly_records DROP CONSTRAINT uid`)
 // -----------********************************************************---------
 
-// db.query(`SELECT * FROM user_stocks`,(err,res)=>{console.log(res.rows)})
-// db.query(`SELECT * FROM stock`,(err,res)=>{console.log(res.rows)})
+// db.query(`SELECT * FROM` user_stocks`,(err,res)=>{console.log(res.rows)})
+// db.query(`SELECT * FROM stock WHERE name='SPLV'`,(err,res)=>{console.log(res.rows)})
 // db.query(`SELECT * FROM logs`,(err,res)=>{console.log(res.rows)})
 // db.query(`SELECT * FROM users`,(err,res)=>{console.log(res.rows)})
 // db.query(`SELECT * FROM user_stocks`,(err,res)=>{console.log(res.rows)})
 // db.query(`SELECT * FROM monthly_records`,(err,res)=>{console.log(res.rows)})
 // db.query(`UPDATE user_stocks SET user_dividend_date = ''`,(err)=>{if(err)console.log(err)})
 // db.query(`UPDATE user_stocks SET quantity = 16.569 WHERE name = 'VOO' AND user_id = 6`,(err)=>{if(err)console.log(err)})
-// db.query(`UPDATE stock SET  dividenddate = '' WHERE name = 'AGNC'`,(err)=>{if(err)console.log(err)})
-// db.query(`DELETE FROM stock WHERE name = 'AMX'`)
+// db.query(`UPDATE stock SET  dividenddate = 'Jan 11 2023' WHERE name = 'AGNC'`,(err)=>{if(err)console.log(err)})
+// db.query(`DELETE FROM stock WHERE name = 'SPLV'`)
 // db.query(`DROP TABLE monthly_records`)
 export{
     db

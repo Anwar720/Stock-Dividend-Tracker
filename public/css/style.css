@@ -442,35 +442,81 @@ select{
     align-items: center;
     padding: 1rem;
     background-color: #232324;
+    margin-bottom:1rem;
+}
+.calander-controls{
+    display: grid;
+    grid-template-columns: repeat(3,1fr);
+    place-items: center;
+    width: 50%;
+    margin: 1rem;
+    font-size: 1.1rem;
+}
+.calander-controls .month{
+    /* border-bottom: 1px solid gray; */
+    padding: 0.1rem;
+    width: fit-content;
+    margin: auto;
+    font-size: 1.3rem;
+}
+.calander-controls i{
+    cursor:pointer;
+}
+.calander-controls i:hover{
+    color:rgb(158, 158, 158);
+}
+
+.calander-controls i:active{
+    transform:scale(1.1);
+    color:var(--clr-secondary);
+}
+.calander_data_wrapper,.calander-container{
+    width:100%;
+}
+.calander_data_wrapper{
+    display: none;
+}
+.show{
+    display: block;
+}
+.transition-right{
+    animation: transition-right 0.5s ease;
+}
+.transition-left{
+    animation: transition-left 0.5s ease;
 }
 .calander_data{
     width: 95%;
-    height: 4.7rem;
+    height: 4rem;
     border-radius: 10px;
     display: flex;
     justify-content: space-evenly;
     align-items: center;
-    margin: 5px;
     position: relative;
-    background: linear-gradient(94deg, #1e1414cc, #57ac8c29);
-    border: 2px solid #1e3a1e;
+    background: linear-gradient(94deg, #232324, #57ac8c29);
+    margin: auto;
+    margin-top: 5px;
+    /* border: 2px solid #1e3a1e; */
 }
 .calander_data > section{
     width: 4.5rem;
 }
 .dividend_date{
-    background:rgb(87, 155, 237);
-    color:rgb(242, 238, 238);
-    position:absolute;
-    left:0;
-    height:100%;
-    width:auto;
-    text-align: center;
+        /* background: rgb(87, 155, 237); */
+    background: var(--clr-secondary);
+    color: rgb(242, 238, 238);
+    position: absolute;
+    left: 0;
+    height: 100%;
+    width: auto;
+    /* text-align: center; */
     border-radius: 10px 0 0 10px;
-    padding:10px;
+    /* padding: 10px; */
     line-height: 55px;
-    width:15rem;
+    width: 15rem;
     max-width: 22%;
+    display: grid;
+    place-items: center;
 }
 
 .calander-icon i{
@@ -632,4 +678,12 @@ select{
         font-size:0.8rem;
     }
     
+}
+@keyframes transition-right {
+    0%{transform: translateX(-100rem);}
+    100%{transform: translateX(0);}
+}
+@keyframes transition-left {
+    0%{transform: translateX(100rem);}
+    100%{transform: translateX(0);}
 }

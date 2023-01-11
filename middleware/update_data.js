@@ -1,5 +1,6 @@
 import yahooFinance from "yahoo-finance";
 import { db } from "../model/DBconnection.js";
+import {getStockInfoFromWeb} from './scraping.js'
 import fs from 'fs';
 
 const hourly_Update_Stock_Price = async ()=>{
@@ -34,11 +35,13 @@ const hourly_Update_Stock_Price = async ()=>{
     }
 }
 
-const monthly_update_dividend_data = async ()=>{
+const  update_yahoo_dividend_dates = async ()=>{
     console.log('updated dividend dates');
-    const stock_names = await db.query(`SELECT name FROM stock`);
+    const stock_names = await db.query(`SELECT name FROM stock WHERE is_date_in_yahoo = true`);
         if(stock_names.rows){
             stock_names.rows.forEach( async stock =>{
+                // return if dividend paying in current month so update next date next month
+                if(stock.dividenddate && new Date(stock.dividenddate).getMonth() == new Date().getMonth()) return 
                 let dataFromYahoo;
                 try{
                     dataFromYahoo  = await yahooFinance.quote(stock.name,['summaryDetail',"calendarEvents"]);
@@ -71,6 +74,7 @@ const monthly_update_dividend_data = async ()=>{
             });
         }
 }
+
 const check_if_monthly_dividend_payer = async (stock)=>{
     let formated_stock = ' ' + stock + ' ';
     const data = fs.readFileSync('./public/lists/monthly_dividend_list.txt', 'utf8');
@@ -208,13 +212,55 @@ const setMonthlyDividendRecords = async ()=>{
     })
 }
 
-// setMonthlyDividendRecords()
+const updateDividendDateAndDateList = async(ticker,nextDate,payment_dates=[])=>{
+    if(!nextDate) return 
+    await db.query(`UPDATE stock SET dividenddate = $2 , date_list = $3 WHERE name = $1`,[ticker.toUpperCase(),nextDate,payment_dates]).catch(e=>console.log('error updating stock date',e.err))
+}
+
+const updateSingleDateAndDateListNotInYahoo = async(name)=>{
+    console.log('stock not in yahoo',name)
+    let today = new Date()
+    try{ 
+        let object_list = await getStockInfoFromWeb(name)
+        let payment_dates = []
+        // filter out older dividend dates
+        object_list.forEach(stock=> {
+            if(new Date(stock.pay_date) >= today) 
+                payment_dates.push(stock.pay_date)
+        })
+        let nextDate = payment_dates.shift()
+        // insert dates further out into date_list
+        updateDividendDateAndDateList(name,nextDate,payment_dates)
+    }catch(e){}
+
+    return 
+}
+
+const updateDividendDatesNotInYahoo = async ()=>{
+    try{
+        let current_month = new Date().getMonth();
+        let stock_list = await db.query(`SELECT name,dividenddate,date_list FROM stock WHERE is_date_in_yahoo = false and yield > 0`)
+        stock_list.rows.forEach(async stock=>{
+            let isFutureDateOrCurrentMonth = stock.dividenddate && new Date(stock.dividenddate)  >= new Date() || stock.dividenddate && new Date(stock.dividenddate).getMonth() == current_month;
+            if(isFutureDateOrCurrentMonth)
+                return 
+            if(!isFutureDateOrCurrentMonth && stock.date_list.length > 1)
+                await updateDividendDateAndDateList(stock.name,stock.date_list.shift(),stock.date_list) 
+            else // get new dividend dates
+                await updateSingleDateAndDateListNotInYahoo(stock.name)
+        });
+    }catch(e){console.log('error updating dividend dates from web')}
+}
+
+
 
 export{hourly_Update_Stock_Price,
-        monthly_update_dividend_data,
+        update_yahoo_dividend_dates ,
         update_total_dividends_earned,
         update_user_entered_dividend_dates,
         update_user_entered_total_dividends_earned,
         check_if_monthly_dividend_payer,
         setYearlyRecords,
-        setMonthlyDividendRecords  }
+        setMonthlyDividendRecords,
+        updateDividendDatesNotInYahoo,
+        updateSingleDateAndDateListNotInYahoo   }

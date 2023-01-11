@@ -1,10 +1,18 @@
 <div class="dividend_calander">
-    <% let date = new Date().toString().substring(4,7); %>
+    <% let date = new Date()%>
+    <% let month = date.toString().substring(4,7);%>
+    <% let year = date.getFullYear()%> 
     
     <h2>Dividend Calander</h2>
+    <div class="calander-controls">
+        <div class="prev"><i class="fa-regular fa-circle-left"></i></div>
+        <div class="month" data-month="<%=month%>" data-year="<%= year %>"><%=month%> </div>
+        <div class="next"><i class="fa-regular fa-circle-right"></i></div>
+    </div>
     <% let dividend_total = 0; %>
-    <% let this_month_list = db.filter(stock => stock.dividenddate.substring(0,3) == date ) %>
-    <% db.map((stock)=>{ if(stock.dividenddate == '' && stock.user_dividend_date != '' && new Date(stock.user_dividend_date).toString().substring(4,7) == date ){ %>
+    <% let this_month_list = db.filter(stock => stock.dividenddate.substring(0,3) ==month) %>
+    
+    <% db.map((stock)=>{ if(stock.dividenddate == '' && stock.user_dividend_date != '' && new Date(stock.user_dividend_date).toString().substring(4,7) ==month){ %> 
         <% stock.dividenddate = new Date(stock.user_dividend_date).toString().substring(4,15); this_month_list.push(stock);}} )%>
 
     <%  this_month_list.sort((a,b) => a.dividenddate.substring(4,6) - b.dividenddate.substring(4,6)); %>
@@ -14,17 +22,21 @@
         <section>Dividend Per Share</section>
         <section>Expected Dividends</section>
     </div>
-    <% this_month_list.forEach(stock=> { %>
-        <div class="calander_data">
-            <h4 class="dividend_date"><%=stock.dividenddate.substring(0,6) %></h4>
-            <section></section>
-            <section> <%=stock.name %> </section>
-            <%let amount = (stock.dividend_amount * stock.quantity).toFixed(2) %>
-            <section>$<%= stock.dividend_amount.toFixed(2) %></section>
-            <section>$<%= amount  %></section>
-            <% dividend_total += parseFloat(amount) %>
-            
-        </div>  
-    <%  })%>
-    <h3 class="month-total"> Total Dividends%>: $<%= dividend_total.toFixed(2) %></h3>
+    
+    <div class="calander-container">
+        <div class="calander_data_wrapper show" data-month="<%=month%>" data-year="<%= year %>">
+            <% this_month_list.forEach(stock=> { %>
+                <div class="calander_data">
+                    <h4 class="dividend_date"><%=stock.dividenddate.substring(0,6) %></h4>
+                    <section></section>
+                    <section> <%=stock.name %> </section>
+                    <%let amount = (stock.dividend_amount * stock.quantity).toFixed(2) %>
+                    <section>$<%= stock.dividend_amount.toFixed(2) %></section>
+                    <section>$<%= amount  %></section>
+                    <% dividend_total += parseFloat(amount) %>
+                </div>
+            <%  })%>
+            <h3 class="month-total"> Total Dividends%>: $<%= dividend_total.toFixed(2) %></h3>
+        </div>
+    </div>
 </div>
