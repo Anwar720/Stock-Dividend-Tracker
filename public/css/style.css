@@ -448,16 +448,15 @@ select{
     display: grid;
     grid-template-columns: repeat(3,1fr);
     place-items: center;
-    width: 50%;
+    width: 70%;
     margin: 1rem;
     font-size: 1.1rem;
 }
 .calander-controls .month{
-    /* border-bottom: 1px solid gray; */
     padding: 0.1rem;
     width: fit-content;
     margin: auto;
-    font-size: 1.3rem;
+    /* font-size: 1.3rem; */
 }
 .calander-controls i{
     cursor:pointer;
@@ -509,10 +508,7 @@ select{
     left: 0;
     height: 100%;
     width: auto;
-    /* text-align: center; */
     border-radius: 10px 0 0 10px;
-    /* padding: 10px; */
-    line-height: 55px;
     width: 15rem;
     max-width: 22%;
     display: grid;

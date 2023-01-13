@@ -225,7 +225,7 @@ app.post('/user/logout',(req,res)=>{
     res.clearCookie("token");
     res.redirect('/login');
 })
-const hourly_price_updater = schedule.scheduleJob({minute:30,tz:'EST'},hourly_Update_Stock_Price);
+// const hourly_price_updater = schedule.scheduleJob({minute:30,tz:'EST'},hourly_Update_Stock_Price);
 const weekly_dividend_date_updater = schedule.scheduleJob({dayOfWeek:0,tz:'EST'},update_yahoo_dividend_dates );
 const update_yahoo_dividend_dates_on_1st_day_of_month = schedule.scheduleJob({date:1,hour:7,tz:'EST'},update_yahoo_dividend_dates);
 // const user_entered_total_dividends_earned_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_user_entered_total_dividends_earned);

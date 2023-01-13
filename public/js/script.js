@@ -30,7 +30,7 @@ remove.forEach((button)=> button.addEventListener('click',async ()=>{
     stock_name.innerText = button.parentElement.querySelector('.edit').getAttribute('data-name');
     delete_Box.style.display = 'grid';
     cancel_btn.addEventListener('click',()=>{
-        console.log('clicked cancel');
+        // console.log('clicked cancel');
         delete_Box.style.display = 'none';
     })
     // if delete is clicked again then send post request
@@ -59,7 +59,7 @@ const delete_confirm  = ()=>{
     let remove_btn = document.querySelector('.verify_delete');
     delete_Box.style.display = 'block';
     cancel_btn.addEventListener('click',()=>{
-        console.log('clicked cancel');
+        // console.log('clicked cancel');
         delete_Box.style.display = 'none';
         return false;
     })
@@ -130,8 +130,8 @@ let current_month_index = 0
 const setFullMonthString = ()=>{
     let Mon = month_element.getAttribute('data-month')
     let year = month_element.getAttribute('data-year') 
-    let month = new Date(Mon + ' '+ year).toLocaleString('en-us',{month:'long'})
-    month = year == currentYear?month: `${month} - ${year}`
+    let month = new Date(Mon + ' 01 '+ year).toLocaleString('en-us',{month:'long'})
+    month = year == currentYear?month: `${month}  ${year}`
     month_element.innerText = month;
 }
 window.addEventListener('load',()=>{
@@ -139,7 +139,7 @@ window.addEventListener('load',()=>{
 })
 
 const displayCalanderForMonth = (month,year,direction='')=>{
-    console.log(month,year,month_element)
+    // console.log(month,year,month_element)
     calander_element_list.forEach(item=>{
         let dateMatched = item.getAttribute("data-month") == month && item.getAttribute("data-year") == year
         if(dateMatched){
@@ -157,7 +157,6 @@ next_month_btn.addEventListener('click',()=>{
     if(current_month_index == calander_element_list.length-1) return 
     else {
             current_month_index++
-            console.log(current_month_index)
             let month = calander_element_list[current_month_index].getAttribute('data-month')
             let year = calander_element_list[current_month_index].getAttribute('data-year')
             displayCalanderForMonth(month,year,'transition-left')
@@ -282,9 +281,9 @@ drawPieGraph();
     const drawBarGraph = () =>{
     function drawChart2() {
         // Define the chart to be drawn.
-        let yield = document.querySelector('.results').firstElementChild.innerText.substr(22);
-            yield = parseFloat(yield.substr(0,yield.length-1))/100;
-        let total = parseFloat(document.querySelector('.expected_income').innerText.substring(27))/yield;
+        let yield = document.querySelector('.dividend_rate').innerText;
+            yield = parseFloat(yield)/100;
+        let total = parseFloat(document.querySelector('.expected_income').innerText)/yield;
             total = parseFloat(total.toFixed(3));
         let year = new Date().getFullYear(); 
         let contribution = parseFloat(document.getElementById('contribution').value)*12 || 0;
@@ -293,13 +292,13 @@ drawPieGraph();
 
         // console.log('contributions:',total, yield,contribution,num_of_years,returns);
         let yearly_data = [];
-        yearly_data.push(['Year', 'Dividend Amount','Account Value']);
+        yearly_data.push(['Year', 'Dividend Amount']);
 
         for(let i = 0;i<num_of_years;i++){
             total+= (total+contribution)*(returns+yield);
             let dividend = parseFloat((total*yield).toFixed(3));
             //console.log('total yield is',yield,'contribution is:',contribution,'percent increase:',)
-            yearly_data.push([`${year+i+1}`,dividend,total]);
+            yearly_data.push([`${year+i+1}`,dividend]);
         }
         // console.log('total yield is',yield+returns,contribution);
         var data = google.visualization.arrayToDataTable(yearly_data);
@@ -309,8 +308,11 @@ drawPieGraph();
             titleTextStyle: {
                 color: '#FFF'
             },
-            colors: ['#32604e','#63bf9c'],
-            legend: {textStyle: {color: 'white'}}
+            colors: ['#63bf9c'],
+            legend: {textStyle: {color: 'white'}},
+            hAxis: {
+                textStyle:{color: 'gray'},
+            }
         }
 
         // Instantiate and draw the chart.
@@ -333,8 +335,7 @@ function drawLineChart(record=getDataForTimespan()){
 
 function drawBackgroundColor() {
     var data = new google.visualization.DataTable();
-    data.addColumn('number', 'X');
-    data.addColumn('number', 'Dogs');
+    
     var data = google.visualization.arrayToDataTable(record);
 
     var options = {
@@ -345,17 +346,23 @@ function drawBackgroundColor() {
         hAxis: {
             textStyle:{color: '#FFF'},
             gridlines: {
-                color: 'none'
+                color: '#0a5739'
             },
         },
         vAxis: {
             textStyle:{color: '#FFF'},
             gridlines: {
-                color: 'none'
+                color: '#0a5739',
             },
             viewWindow:{
                 min:-1
             }
+        },
+        chartArea: {
+            // leave room for y-axis labels
+            width: '85%',
+            height:'72%',
+            top:'70'
         },
         selectionMode: 'multiple',
         animation: {
