@@ -109,6 +109,7 @@ const update_total_dividends_earned = async ()=>{
             (err)?console.log(err.message):console.log('success update stock price')});
         }
 }
+
 //updates dividends recieved based on user entered dividend date
 const update_user_entered_total_dividends_earned = async ()=>{
     let today = new Date().toISOString().slice(0,10);

@@ -53,8 +53,9 @@ app.get("/register",checkNotAuthenticated ,(req,res)=>{
     registerError=''
 })
 
-// render home page
+
 let error="";
+// render home page
 app.get("/",checkAuthenitcated,async(req,res)=>{
     const {user_id} = verifyJwt(req.cookies['token']);
     const year = new Date().getFullYear();
@@ -63,7 +64,6 @@ app.get("/",checkAuthenitcated,async(req,res)=>{
     //get dividend records for dividends earned this year
     const yearly_records = await db.query(`SELECT * FROM yearly_records WHERE user_id = $1 and year = $2`,[user_id,year])
 
-    // console.log(data.rows)
     res.render('index',{db:data.rows,yearly_records:yearly_records.rows[0],error});
     error="";
 })
@@ -146,7 +146,7 @@ app.post("/",async (req,res)=>{
         stock_quantity = parseFloat(stock_quantity);
         stock_name = stock_name.toUpperCase();
         let estimated_Annual_dividends = parseFloat(yields.rows[0].yield*stock_quantity).toFixed(4);
-            let user_dividend_date = new Date(req.body.user_dividend_date.replace(/-/g, '\/').replace(/T.+/, '') )|| '';
+            let user_dividend_date = (req.body.user_dividend_date)? new Date(req.body.user_dividend_date.replace(/-/g, '\/').replace(/T.+/, '') ) : '';
                 user_dividend_date = (user_dividend_date && req.body.user_dividend_date)?user_dividend_date.toISOString().slice(0,10):'';
             // console.log('user date is:',req.body.user_dividend_date,'parsed is: ',user_dividend_date)
         // check if the stock exists in the users_stock table
@@ -175,6 +175,8 @@ app.post("/",async (req,res)=>{
         return res.redirect('/');
     }
 });
+
+
 app.post('/get-monthly-dividend-history',checkAuthenitcated, async(req,res)=>{
     const {user_id} = verifyJwt(req.cookies['token']);
     //get monthly records for dividend calander
@@ -182,7 +184,6 @@ app.post('/get-monthly-dividend-history',checkAuthenitcated, async(req,res)=>{
     // console.log(monthly_records.rows)
     res.send(monthly_records.rows)
 })
-
 
 app.post('/delete',(req,res)=>{
     const {user_id} = verifyJwt(req.cookies['token']) ;
