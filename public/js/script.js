@@ -347,7 +347,7 @@ function drawBackgroundColor() {
             textStyle:{color: '#FFF'},
             gridlines: {
                 color: '#0a5739'
-            },
+            }
         },
         vAxis: {
             textStyle:{color: '#FFF'},
@@ -355,7 +355,7 @@ function drawBackgroundColor() {
                 color: '#0a5739',
             },
             viewWindow:{
-                min:-1
+                min:0
             }
         },
         chartArea: {

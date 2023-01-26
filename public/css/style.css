@@ -134,13 +134,12 @@ body{
     right: -1.1rem;
     top: 2rem;
     background: rgba(0, 0, 0, 0.739);
-    transition: 0.5s ease;
     z-index: 50;
     transform: translateX(20rem);
     transition: 0.2s ease;
     display: grid;
     grid-template-columns: 1fr;
-    padding: 0.7rem;
+    padding: 0.2rem  0.4rem;
     color: white;
     opacity: 0;
     place-items: center;
@@ -259,10 +258,12 @@ i{
     border:none;
     background:transparent;
     cursor:pointer;
-    flex:0;
-    margin:7px;
+    /* flex:0;
+    margin:7px; */
 }
-
+.delete i{
+    margin-right: 1rem;
+}
 .delete i:hover{
     text-shadow: 0 0 1px rgb(159, 55, 55);
 }
@@ -270,7 +271,7 @@ i{
     align-items: center;
     border:none;
     background:transparent;
-    margin:5px;
+    /* margin:5px; */
     cursor:pointer;
 }
 
@@ -316,7 +317,14 @@ i{
     background:#e43757b3;
     color:rgb(202, 214, 250);
     margin-bottom:5px;
-    padding:10px 5px;
+    padding:10px 1rem;
+    border-radius:8px;
+}
+.success-msg{
+    background:#7efa7e6e;
+    color:rgb(202, 214, 250);
+    margin-bottom:5px;
+    padding:10px 1rem;
     border-radius:8px;
 }
 .cover{
@@ -564,17 +572,26 @@ select{
 
 }
 .login input ,.register input{
-    width:20rem;
-    max-width:87%;
-    height:3rem;
-    padding:5px;
-    border-radius: 10px;
+    width: 20rem;
+    max-width: 87%;
+    height: 3rem;
+    padding: 5px;
     font-size: 1rem;
-    box-shadow: 3px 2px 12px rgb(46, 43, 43)
+    border: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+}
+.login input:active,
+.login input:focus,
+.register input:active,
+.register input:focus{
+    border:none;
+    outline:none;
 }
 .login i,.register i{
     font-size: 1rem;
     margin:5px;
+    color:rgb(69, 69, 69);
 }
 .login a{
     color:rgb(233, 207, 114);
@@ -586,7 +603,8 @@ select{
     margin:0 1rem;
 }
 .body{
-    background-image:linear-gradient(rgb(88, 169, 170),rgb(89, 115, 194) ,rgb(41, 59, 105));
+    /* background-image:linear-gradient(rgb(88, 169, 170),rgb(89, 115, 194) ,rgb(41, 59, 105)); */
+    background:  var(--clr-primary-500);
     display:flex;
     min-height: 30rem;
     flex-direction: column;
@@ -597,8 +615,11 @@ select{
 
 .body input[type="submit"]{
     cursor:pointer;
-    background: linear-gradient( rgb(146, 108, 196),rgb(75, 49, 95));
+    /* background: linear-gradient( rgb(146, 108, 196),rgb(75, 49, 95)); */
     color:white;
+    background: var(--clr-secondary);
+    border-radius: 1rem;
+
 }
 .body input[type="submit"]:hover{
     box-shadow:0 0 8px rgb(138, 150, 205) ;
@@ -620,6 +641,14 @@ select{
     height:0.5rem;
     /* width:50%; */
     background:linear-gradient(green,rgb(159, 232, 159));
+}
+.input-wrapper{
+    background: white;
+    border: none;
+    border-radius: 1rem;
+    width: 80%;
+    margin: 0 auto;
+    overflow: hidden;
 }
 
 /* ------------- */

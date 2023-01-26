@@ -32,9 +32,9 @@
             <input type="submit" id="add" class="add" value='Add Stock'></input>
             
         </div>
-            <% if (error != '') { %>
-                <h3 class="error"> <%= error %></h3>
-                <% } %>
+            <% if (messages.error) {%>
+                <h3 class="error"> <%= messages.error %></h3>
+            <% } %>  
         <form id="add-data" class="add-data" method="post" action="/">
             <i id="close" class="fas fa-times"></i>
             <span  class="stock-data"><span>Ticker Name:</span><input name="stock_name" id="stock_name" type="text" autocomplete="off" required ></span>    

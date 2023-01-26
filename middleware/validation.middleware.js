@@ -6,8 +6,10 @@ let Validation = [
 const validate_stock_input = (req)=>{
     const valid_name =  /^[A-Za-z]+$/;
     return valid_name.test(req.body.stock_name) && !valid_name.test(req.body.stock_quantity) && req.body.stock_quantity > 0;
-    
 }
+
 export{
-    Validation,validationResult,validate_stock_input
+    Validation,
+    validationResult,
+    validate_stock_input
 }

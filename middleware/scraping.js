@@ -7,7 +7,6 @@ const getStockInfoFromWeb = async (ticker) => {
     if(!ticker || ticker.length === 0) return []
 
     return await axios.get(`https://dividendhistory.org/payout/${ticker.toUpperCase()}/`) 
-    // axios.get(`https://www.nasdaq.com/market-activity/funds-and-etfs/${ticker}/dividend-history`) 
 	.then(({ data }) => { 
 		const $ = cheerio.load(data); 
 		const info = $('#dividend_table tbody tr td').map((_, product) => 
@@ -33,5 +32,4 @@ const getStockInfoFromWeb = async (ticker) => {
     }
 	});
 }
-// getStockInfoFromWeb('AGNC')
 export{ getStockInfoFromWeb }

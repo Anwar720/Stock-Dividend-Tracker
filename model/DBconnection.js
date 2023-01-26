@@ -99,7 +99,7 @@ db.connect((err,res)=>{
 // -----------********************************************************---------
 
 // db.query(`SELECT * FROM` user_stocks`,(err,res)=>{console.log(res.rows)})
-// db.query(`SELECT * FROM stock WHERE name='SPLV'`,(err,res)=>{console.log(res.rows)})
+// db.query(`SELECT * FROM stock WHERE name='ASDFASDFASDF'`,(err,res)=>{console.log(res.rows)})
 // db.query(`SELECT * FROM logs`,(err,res)=>{console.log(res.rows)})
 // db.query(`SELECT * FROM users`,(err,res)=>{console.log(res.rows)})
 // db.query(`SELECT * FROM user_stocks`,(err,res)=>{console.log(res.rows)})
@@ -107,7 +107,8 @@ db.connect((err,res)=>{
 // db.query(`UPDATE user_stocks SET user_dividend_date = ''`,(err)=>{if(err)console.log(err)})
 // db.query(`UPDATE user_stocks SET quantity = 16.569 WHERE name = 'VOO' AND user_id = 6`,(err)=>{if(err)console.log(err)})
 // db.query(`UPDATE stock SET  dividenddate = 'Jan 11 2023' WHERE name = 'AGNC'`,(err)=>{if(err)console.log(err)})
-// db.query(`DELETE FROM stock WHERE name = 'SPLV'`)
+// db.query(`DELETE FROM users WHERE email = 'user7@gmail.com'`)
+// db.query(`DELETE FROM stock WHERE name = 'SPY'`)
 // db.query(`DROP TABLE monthly_records`)
 export{
     db

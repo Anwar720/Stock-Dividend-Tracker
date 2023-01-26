@@ -1,6 +1,7 @@
 import yahooFinance from "yahoo-finance";
 import { db } from "../model/DBconnection.js";
 import {getStockInfoFromWeb} from './scraping.js'
+import {formatStockData,getFormatedStockDataFromYahoo} from './yahooFunctions.js'
 import fs from 'fs';
 
 const hourly_Update_Stock_Price = async ()=>{
@@ -219,7 +220,6 @@ const updateDividendDateAndDateList = async(ticker,nextDate,payment_dates=[])=>{
 }
 
 const updateSingleDateAndDateListNotInYahoo = async(name)=>{
-    console.log('stock not in yahoo',name)
     let today = new Date()
     try{ 
         let object_list = await getStockInfoFromWeb(name)
@@ -253,8 +253,68 @@ const updateDividendDatesNotInYahoo = async ()=>{
     }catch(e){console.log('error updating dividend dates from web')}
 }
 
+const insertNewStockInDB = async (req,res,stock_name)=>{
+    if(!stock_name){
+        throw 'stock not found'
+        return 
+    }
 
+    let formatedStockData = {}
+    try{
+        //get data from yahoo
+        formatedStockData = await getFormatedStockDataFromYahoo(stock_name)
+        if(!formatedStockData.price) throw 'Price not found'
+    }catch(e){
+        throw 'stock not in yahoo'
+    }
 
+    try{ // Inserting new Stock data to stock db
+        const {yields,price,dividendDate,monthly_payer,dividend_amount,is_date_in_yahoo } = formatedStockData
+        const data_array = [stock_name.toUpperCase(),price,yields,dividendDate,monthly_payer,dividend_amount,is_date_in_yahoo];
+        const insert = `INSERT INTO stock(name,price,yield,dividendDate,monthly_payer,dividend_amount,is_date_in_yahoo) VALUES ($1,$2,$3,$4,$5,$6,$7)`;
+        // console.log(stock_name.toUpperCase(),price,yields,dividendDate,monthly_payer,dividend_amount,is_date_in_yahoo)
+        db.query(insert,data_array,async (err,result)=>{
+            if(result){
+                console.log('successful insert: ');
+                // update dividend date if not available already
+                if(dividendDate == '')
+                    await updateSingleDateAndDateListNotInYahoo(stock_name.toUpperCase())
+            }
+        });
+    }catch(e){
+        throw 'error with database'
+    }
+    return 
+}
+
+// Insert data in user_stock table
+const addStockToUserStockList = async(uid, stock_name, quantity)=>{
+    const yields = await db.query(`SELECT yield FROM stock WHERE name = $1`,[stock_name.toUpperCase()]);
+    let   estimated_Annual_dividends = parseFloat(yields.rows[0].yield*quantity).toFixed(4) || 0;
+    const getDataFromUserTable = await db.query(`SELECT * FROM user_stocks WHERE name = $1 AND user_id = $2`,[stock_name,uid]);
+    const isStockAlreadyInUserTable = getDataFromUserTable.rows.length !== 0
+    try{
+        if(isStockAlreadyInUserTable){
+            // update the stock quantity 
+            db.query(`UPDATE user_stocks SET quantity = $1 , total = $4 WHERE user_id = $2 AND name = $3`,
+                    [quantity,uid,stock_name,estimated_Annual_dividends],
+                (err)=>{
+                    if(err)  throw 'error', "Error with updating stock data";
+                });
+        }else{
+            // insert the stock 
+            db.query(`INSERT INTO user_stocks (user_id,name,quantity,total) VALUES ($1,$2,$3,$4)`,
+            [uid,stock_name,quantity,estimated_Annual_dividends],
+                (err)=>{
+                    if(err) console.log(err.message)
+                });
+        }
+    }catch(e){
+        throw 'error inserting in user stock table'
+    }
+}
+
+// console.log(await getFormatedStockDataFromYahoo('ttsla'))
 export{hourly_Update_Stock_Price,
         update_yahoo_dividend_dates ,
         update_total_dividends_earned,
@@ -264,4 +324,6 @@ export{hourly_Update_Stock_Price,
         setYearlyRecords,
         setMonthlyDividendRecords,
         updateDividendDatesNotInYahoo,
-        updateSingleDateAndDateListNotInYahoo   }
+        updateSingleDateAndDateListNotInYahoo,
+        insertNewStockInDB,
+        addStockToUserStockList   }
