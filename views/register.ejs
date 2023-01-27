@@ -1,6 +1,6 @@
 <%- include('head') -%>
 <body class="body">
-    <%- include('logo') -%>
+    <%#- include('logo') -%>
         <form id="register" class="register" method="post" action="/user/register">
             
             <h2>Create an account</h2>
@@ -14,6 +14,7 @@
             <% } %>
             <% console.log('messages:',messages) %> 
             <!-- <p class="errors"></p> -->
+            <a href="/login">Login</a>
             <input type="submit" class="register_submit" value="submit">
         </form>
 

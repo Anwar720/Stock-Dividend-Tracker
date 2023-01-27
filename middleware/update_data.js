@@ -30,8 +30,7 @@ const hourly_Update_Stock_Price = async ()=>{
             db.query(`UPDATE logs SET  hourly_stock_price_updated = $1`,[date.toLocaleString('en-US', {
                 timeZone: 'America/New_York',
             })],(err)=>{
-                (err)?console.log(err.message):console.log('success update stock price')});
-            console.log('Updating Stock Prices');
+                (err)?console.log('updating stock log error:',err.message):console.log('success update stock price')});
         }
     }
 }
