@@ -210,10 +210,10 @@ window.onload = async ()=>{
                 let month = date.toString().substring(4,7);
                 let year = date.getFullYear()
                 // console.log(stock);
-                if(stock.month != month && year != stock.year){
+                // if(stock.month != month && year != stock.year){
                     all_monthly_data.push(stock)
                     current_month_index++
-                }
+                // }
                 //format data for chart
                 monthly_record.push([`${stock.month}-${stock.year}`,stock.total_dividends])
             })

@@ -173,6 +173,7 @@ const update_yahoo_dividend_dates_on_1st_day_of_month = schedule.scheduleJob({da
 // const user_entered_total_dividends_earned_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_user_entered_total_dividends_earned);
 const total_dividends_earned_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_total_dividends_earned);
 const updating_dividend_dates_not_in_yahoo = schedule.scheduleJob({dayOfWeek:0,hour:7,tz:'EST'},updateDividendDatesNotInYahoo);
+const MonthStartupdating_dividend_dates_not_in_yahoo = schedule.scheduleJob({date:1,hour:7,tz:'EST'},updateDividendDatesNotInYahoo);
 const setYearlyDividendRecords = schedule.scheduleJob({month:0,hour:0,minute:1,tz:'EST'},setYearlyRecords);
 const setMonthyDividendRecords = schedule.scheduleJob({date:25,hour:0,minute:1,tz:'EST'},setMonthlyDividendRecords);
 

@@ -240,6 +240,7 @@ const updateDividendDatesNotInYahoo = async ()=>{
     try{
         let current_month = new Date().getMonth();
         let stock_list = await db.query(`SELECT name,dividenddate,date_list FROM stock WHERE is_date_in_yahoo = false and yield > 0`)
+        console.log('updateList:',stock_list.rows)
         stock_list.rows.forEach(async stock=>{
             let isFutureDateOrCurrentMonth = stock.dividenddate && new Date(stock.dividenddate)  >= new Date() || stock.dividenddate && new Date(stock.dividenddate).getMonth() == current_month;
             if(isFutureDateOrCurrentMonth)
