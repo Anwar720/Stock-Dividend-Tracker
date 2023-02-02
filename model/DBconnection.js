@@ -5,7 +5,11 @@ const STOCK_TABLE = `
         name TEXT UNIQUE,
         price FLOAT,
         yield FLOAT(15),
-        dividendDate TEXT
+        dividendDate TEXT,
+        dividend_amount FLOAT,
+        monthly_payer BOOLEAN,
+        is_date_in_yahoo BOOLEAN DEFAULT false,
+        date_list TEXT ARRAY DEFAULT ARRAY[]::varchar[]
         );`;
 
 const USER = `CREATE TABLE IF NOT EXISTS users(
@@ -19,6 +23,10 @@ const USER_STOCK = `CREATE TABLE IF NOT EXISTS user_stocks(
                     name TEXT,
                     quantity FLOAT,
                     total FLOAT,
+                    this_years_dividends FLOAT DEFAULT 0.00,
+                    dividend_dates JSON ARRAY,
+                    total_dividends_earned float DEFAULT 0.00,
+                    user_dividend_date TEXT,
                     PRIMARY KEY(id),
                     FOREIGN KEY(user_id)
                     REFERENCES users(user_id) 
@@ -52,10 +60,18 @@ const db = new pg.Pool({
     }
 });
 
-db.connect((err,res)=>{
-    if(res) console.log('Successful connection to db');
-    if (err) console.log('Unable to connect to db',err);
-});
+// const client = db.connect((err,res)=>{
+//     if(res) console.log('Successful connection to db');
+//     if (err) console.log('Unable to connect to db',err);
+// });
+
+// db.on('error', (err, client) => {
+//     console.error('Unexpected error on idle client', err)
+//     process.exit(-1)
+// })
+
+
+
 // db.query(STOCK_TABLE,(err)=>{
 //     if(!err)return console.log('successful stock Table insert');
 //     return console.log('error with query',err.message);
@@ -92,17 +108,17 @@ db.connect((err,res)=>{
 // db.query(`ALTER TABLE stock ADD COLUMN date_list TEXT ARRAY DEFAULT ARRAY[]::varchar[] `)
 // db.query(`ALTER TABLE user_stocks ADD COLUMN this_years_dividends FLOAT DEFAULT 0.00`)
 // db.query(`ALTER TABLE user_stocks ADD COLUMN dividend_dates JSON ARRAY`)
-// db.query(`ALTER TABLE user_stocks ADD COLUMN total_dividends_earned float`)
+// db.query(`ALTER TABLE user_stocks ALTER COLUMN total_dividends_earned SET DEFAULT 0.00`)
 // db.query(`ALTER TABLE user_stocks ALTER COLUMN total_dividends_earned SET DEFAULT 0.00`)
 // db.query(`ALTER TABLE user_stocks ADD COLUMN user_dividend_date TEXT`)
 // db.query(`ALTER TABLE yearly_records DROP CONSTRAINT uid`)
 // -----------********************************************************---------
 
-// db.query(`SELECT * FROM` user_stocks`,(err,res)=>{console.log(res.rows)})
+// db.query(`SELECT * FROM user_stocks WHERE user_id = 1`,(err,res)=>{console.log(res.rows);db.release()})
 // db.query(`SELECT * FROM stock WHERE name='ASDFASDFASDF'`,(err,res)=>{console.log(res.rows)})
 // db.query(`SELECT * FROM logs`,(err,res)=>{console.log(res.rows)})
 // db.query(`SELECT * FROM users`,(err,res)=>{console.log(res.rows)})
-// db.query(`SELECT * FROM user_stocks`,(err,res)=>{console.log(res.rows)})
+// db.query(`SELECT * FROM user_stocks WHERE user_id = 6`,(err,res)=>{console.log(res.rows)})
 // db.query(`SELECT * FROM monthly_records`,(err,res)=>{console.log(res.rows)})
 // db.query(`UPDATE user_stocks SET user_dividend_date = ''`,(err)=>{if(err)console.log(err)})
 // db.query(`UPDATE user_stocks SET quantity = 16.569 WHERE name = 'VOO' AND user_id = 6`,(err)=>{if(err)console.log(err)})

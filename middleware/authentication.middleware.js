@@ -3,23 +3,31 @@ import { db } from "../model/DBconnection.js";
 import jwt from 'jsonwebtoken';
 
 const register_user =  async (req,res)=> {
+    const client = await db.connect()
         const {email,password} = req.body;
         const salt = 10;
-        const user = await db.query(`SELECT * FROM users WHERE email = $1 `,[email]);
+        const user = await client.query(`SELECT * FROM users WHERE email = $1 `,[email]);
             if(user.rows.length == 0){
                     const hash = await bcrypt.hash(password,salt);
                     const newUser = `INSERT INTO USERS (email,password) VALUES ($1,$2)`;
-                    db.query(newUser,[email,hash],(insertError)=>{
+                    client.query(newUser,[email,hash],(insertError)=>{
                         if(insertError)console.log('Register db:',err.message);
                     });
+                    // release the client
+                    client.release()
                     return true;
         }
+        // release the client
+        client.release()
         return false;
     };
 
 const login_user = async(req,res)=>{
     const {email,password} = req.body;
-    const user = await db.query(`SELECT * FROM users WHERE email = $1 `,[email]);
+    const client = await db.connect()
+    const user = await client.query(`SELECT * FROM users WHERE email = $1 `,[email]);
+    // release the client
+    client.release()
     if(!user.rows[0]){
         return false;
     }

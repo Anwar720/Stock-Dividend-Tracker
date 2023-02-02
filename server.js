@@ -33,9 +33,11 @@ import  flash from 'express-flash'
 const app = express();
 const port = process.env.PORT || 3000;
 
-process.on('uncaughtException', (error)  => {
+process.on('uncaughtException', async (error)  => {
+    // if(err.code === '57p01') await db.connect()
     console.log('🔥🚀Alert! ERROR : ',  error);
     process.exit(1);
+
 })
 
 app.set('view engine','ejs');
@@ -63,22 +65,28 @@ app.get("/register",checkNotAuthenticated ,(req,res)=>{
 
 // render home page
 app.get("/",checkAuthenitcated,async(req,res)=>{
+    const client = await db.connect()
     const {user_id} = verifyJwt(req.cookies['token']);
     const year = new Date().getFullYear();
     //get stock data
-    const data = await db.query('SELECT  * FROM user_stocks u INNER JOIN stock s ON u.name = s.name WHERE user_id = $1',[user_id]);
+    const data = await client.query('SELECT  * FROM user_stocks u INNER JOIN stock s ON u.name = s.name WHERE user_id = $1',[user_id]);
     //get dividend records for dividends earned this year
-    const yearly_records = await db.query(`SELECT * FROM yearly_records WHERE user_id = $1 and year = $2`,[user_id,year])
+    const yearly_records = await client.query(`SELECT * FROM yearly_records WHERE user_id = $1 and year = $2`,[user_id,year])
+
+    // release the client
+    client.release()
     res.render('index',{db:data.rows,yearly_records:yearly_records.rows[0]});
 })
 
 app.get('/admin',checkAuthenitcated,async (req,res)=>{
     const {user_id} = verifyJwt(req.cookies['token']);
     if(user_id === 8 || user_id == 6){
-        const stocks = await db.query(`SELECT  * FROM stock`);
-        const user_stocks = await db.query(`SELECT  * FROM user_stocks`);
-        const logs = await db.query(`SELECT  * FROM logs`);
+        const client = await db.connect()
+        const stocks = await client.query(`SELECT  * FROM stock`);
+        const user_stocks = await client.query(`SELECT  * FROM user_stocks`);
+        const logs = await client.query(`SELECT  * FROM logs`);
         // console.log(user_stocks.rows);
+        client.release()
         return res.render('admin_dash',{data:stocks.rows,user_stocks:user_stocks.rows,logs:logs.rows});
     }
     return res.redirect('/');
@@ -92,10 +100,13 @@ app.post("/",async (req,res)=>{
         req.flash('error', "Invalid Ticker Info");
         return res.redirect("/");
     }
+    const client = await db.connect()
     const {user_id} = verifyJwt(req.cookies['token']) ;
     let {stock_name,stock_quantity} = req.body;
-    const dbResult = await db.query(`SELECT * FROM stock WHERE name = $1`,[`${stock_name.toUpperCase()}`]);
+    const dbResult = await client.query(`SELECT * FROM stock WHERE name = $1`,[`${stock_name.toUpperCase()}`]);
     const isStockFoundInDb = dbResult.rows.length !== 0
+    // release the client
+    client.release()
 
     if(!isStockFoundInDb){
         try{// Inserting new Stock data to stock database
@@ -112,23 +123,29 @@ app.post("/",async (req,res)=>{
         console.log('error:',e.message)
         req.flash('error', "Unexpected Error adding stock");
     }
-    return res.redirect('/');
 
+    return res.redirect('/');
 });
 
 
 app.post('/get-monthly-dividend-history',checkAuthenitcated, async(req,res)=>{
+    const client = await db.connect()
     const {user_id} = verifyJwt(req.cookies['token']);
     //get monthly records for dividend calander
-    const monthly_records = await db.query(`SELECT * FROM monthly_records where user_id = $1 ORDER BY year,EXTRACT(MONTH FROM TO_DATE(month, 'Mon'))`,[user_id]);
-    // console.log(monthly_records.rows)
+    const monthly_records = await client.query(`SELECT * FROM monthly_records where user_id = $1 ORDER BY year,EXTRACT(MONTH FROM TO_DATE(month, 'Mon'))`,[user_id]);
+
+    // release the client
+    client.release()
     res.send(monthly_records.rows)
 })
 
-app.post('/delete',(req,res)=>{
+app.post('/delete',async (req,res)=>{
+    const client = await db.connect()
     const {user_id} = verifyJwt(req.cookies['token']) ;
-    db.query(`DELETE FROM user_stocks WHERE id = $1 AND user_id = $2`,[parseInt(req.body.id),user_id],(err)=>{
+    await client.query(`DELETE FROM user_stocks WHERE id = $1 AND user_id = $2`,[parseInt(req.body.id),user_id],(err)=>{
         if(err) console.log(err.message);
+        // release the client
+        client.release()
         res.redirect('/');
         console.log('removed id',req.body.id);
     })

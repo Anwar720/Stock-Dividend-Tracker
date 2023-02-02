@@ -60,8 +60,9 @@
             <div id="stock_list">
                 <%let totalSum = 0; %>
                 <%let totalCash = 0; %>
-                <%let dividends_earned = 0; %>
-            
+                <%let total_dividends_earned = 0; %>
+                <%let this_year_dividends_earned = 0; %>
+
             
                 <% for( var i = 0; i < db.length; i++){ %>
                         <div class="inventory">
@@ -70,7 +71,7 @@
                             <div class="stock-quantity inv-field"><%= db[i].quantity.toFixed(3).replace(/0{0,2}$/, ""); %></div>
                             <div class="stock-quantity inv-field"><%=  (db[i].yield/parseFloat(db[i].price)*100).toFixed(2) %>%</div>
                             <div class="stock-yield inv-field">$<%= db[i].yield.toFixed(2) || '0.00'%></div>
-                            <div class="stock-yield inv-field">$<%=db[i].total_dividends_earned.toFixed(2)%></div>
+                            <div class="stock-yield inv-field">$<%=parseFloat(db[i].total_dividends_earned).toFixed(2) || 0%></div>
                             <div class="stock-total inv-field">$<%= db[i].total.toFixed(2) || '0.00' %></div>
                             <input type="checkbox" id="option<%=i%>" style="display:none;">
                             <label  class="action-label" tabindex="<%=i%>"  onblur="setUnchecked(this)" for="option<%=i%>" ><i class="options fas fa-ellipsis-v"></i></i>
@@ -84,14 +85,18 @@
                             
                             <%totalSum += db[i].total %>
                             <%totalCash += (parseFloat(db[i].price)*db[i].quantity)%>
-                            <%dividends_earned += (parseFloat(db[i].total_dividends_earned))%>
+                            <%total_dividends_earned += (parseFloat(db[i].total_dividends_earned))%>
+                            <%this_year_dividends_earned += (parseFloat(db[i].this_years_dividends))%>
+            
                         </div>
                     <% } %>
+                    <% console.log('earned:',this_year_dividends_earned) %>
                     <div class="results">
                         <!-- changing this will affect bar graph data -->
                         <h2 class="sum ">Annual Dividend Rate: <span class="dividend_rate"><%= ((totalSum/totalCash*100).toFixed(2) > 0)?(totalSum/totalCash*100).toFixed(2):0 %></span>%</h2>
-                        <h2 class="sum ">Annual Dividend Income:  $<span class="expected_income"><%=parseFloat((totalSum).toFixed(2)) || 0 %></span><div class="bar"><div class="fill" data-fill="<% if(yearly_records &&  yearly_records.total_dividends) { %> <%= ((yearly_records.total_dividends || 0)/parseFloat((totalSum).toFixed(2)) * 100).toFixed(2)  %> <% } else { %> 0 <% } %>  "></div></div></h2>
-                        <h2 class="sum">Dividends Earned:  $<%= dividends_earned.toFixed(2) %> </h2>
+                        <!-- this_year_dividends_earned -->
+                        <h2 class="sum ">Annual Dividend Income:  $<span class="expected_income"><%=parseFloat((totalSum).toFixed(2)) || 0 %></span><div class="bar"><div class="fill" data-fill="<% if(yearly_records &&  yearly_records.total_dividends) { %> <%= ((yearly_records.total_dividends || 0)/parseFloat((totalSum).toFixed(2)) * 100).toFixed(2)  %> <% } else { %> 0 <% } %>  "></div></div></h2> 
+                        <h2 class="sum">Dividends Earned:  $<%= total_dividends_earned.toFixed(2) %> </h2>
                     </div>
             </div>
         </div>
