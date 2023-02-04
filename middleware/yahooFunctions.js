@@ -44,7 +44,7 @@ const getFormatedStockDataFromYahoo = async (stock_name)=>{
 
     return await formatStockData(stock_data,stock_name)
 }
-
+// console.log(getFormatedStockDataFromYahoo('AAPL'))
 export{
     formatStockData,
     getFormatedStockDataFromYahoo

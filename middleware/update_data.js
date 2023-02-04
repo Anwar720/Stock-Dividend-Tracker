@@ -3,6 +3,7 @@ import { db } from "../model/DBconnection.js";
 import {getStockInfoFromWeb} from './scraping.js'
 import {formatStockData,getFormatedStockDataFromYahoo} from './yahooFunctions.js'
 import fs from 'fs';
+import { logEvent } from "../utils/logs.js";
 
 const hourly_Update_Stock_Price = async ()=>{
     const date = new Date();
@@ -92,6 +93,7 @@ const check_if_monthly_dividend_payer = async (stock)=>{
 const update_total_dividends_earned = async ()=>{
     let today = new Date().toString().slice(4,15)
     let year = new Date().setFullYear()
+    logEvent('update total dividends earned called')
     const client = await db.connect()
     console.log(today)
     let update_quantity_list = await client.query(`SELECT * FROM stock u INNER JOIN user_stocks s ON u.name = s.name WHERE dividenddate = $1`,[today]);
@@ -182,7 +184,12 @@ const update_user_entered_dividend_dates = async ()=>{
 
 const resetYearlyDividends = async()=>{
     const client = await db.connect()
-    await client.query(`UPDATE user_stocks SET this_years_dividends = 0.00`,(err)=>{if(err)console.log('error with reseting yearly dividends:',err)})
+    try{
+        await client.query(`UPDATE user_stocks SET this_years_dividends = 0.00`,(err)=>{if(err)console.log('error with reseting yearly dividends:',err)})
+        logEvent('successful reset of this years dividends in user stocks')
+    }catch(e){
+        logEvent('issue resetting this years dividends in user stocks')
+    }
     // release the client
     client.release()
 }
@@ -191,14 +198,19 @@ const resetYearlyDividends = async()=>{
 const setYearlyRecords = async ()=>{
     const client = await db.connect()
     const users =  await client.query(`SELECT * FROM users`)
-    users.rows.forEach(async user => {
-        let total = await client.query(`SELECT SUM(this_years_dividends) FROM user_stocks WHERE user_id = ${user.user_id}`);
-        let year  = new Date().getFullYear();
-        let total_dividends = total.rows[0].sum || 0.00
-        console.log(user.user_id,year,total.rows[0].sum)
-         // upload data to yearly record table
-        await client.query(`INSERT INTO yearly_records (user_id,year,total_dividends) VALUES ($1,$2,$3)`,[user.user_id,year,total_dividends])
-    })
+    try{
+        users.rows.forEach(async user => {
+            let total = await client.query(`SELECT SUM(this_years_dividends) FROM user_stocks WHERE user_id = ${user.user_id}`);
+            let year  = new Date().getFullYear();
+            let total_dividends = total.rows[0].sum || 0.00
+            console.log(user.user_id,year,total.rows[0].sum)
+            // upload data to yearly record table
+            await client.query(`INSERT INTO yearly_records (user_id,year,total_dividends) VALUES ($1,$2,$3)`,[user.user_id,year,total_dividends])
+        })
+        logEvent('successfuly upload yearly records')
+    }catch(e){
+        logEvent('error uploading yearly records:-->',e.message)
+    }
     // release the client
     client.release()
     resetYearlyDividends()
@@ -229,10 +241,10 @@ const setMonthlyDividendRecords = async ()=>{
                 expected_dividends:stock.dividend_amount * stock.quantity, 
                 dividenddate:stock.dividenddate || new Date(stock.user_dividend_date).toString().substring(4,15)}
         })
-        console.log(month_report)
         // push report into monthly record table
         await client.query(`INSERT INTO monthly_records (user_id,month,year,stock_list,total_dividends) VALUES ($1,$2,$3,$4,$5)`,[user.user_id,month_string,year,month_report,month_total])
     })
+    logEvent('uploading monthly dividend records')
     // release the client
     client.release()
 }
@@ -258,7 +270,10 @@ const updateSingleDateAndDateListNotInYahoo = async(name)=>{
         let nextDate = payment_dates.shift()
         // insert dates further out into date_list
         updateDividendDateAndDateList(name,nextDate,payment_dates)
-    }catch(e){}
+        logEvent(`updating ${name} dividend info from web`)
+    }catch(e){
+        logEvent(`error updating ${name} dividend info from web`)
+    }
 
     return 
 }

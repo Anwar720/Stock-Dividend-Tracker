@@ -31,7 +31,10 @@ const USER_STOCK = `CREATE TABLE IF NOT EXISTS user_stocks(
                     FOREIGN KEY(user_id)
                     REFERENCES users(user_id) 
                     )`;
-
+const all_logs = `CREATE TABLE IF NOT EXISTS all_logs(
+                time TEXT NOT NULL,
+                event TEXT
+)`
 const logs =`CREATE TABLE IF NOT EXISTS logs(
             hourly_stock_price_updated TEXT,
             yahoo_dividend_date_updated TEXT[],
@@ -60,7 +63,7 @@ const db = new pg.Pool({
     }
 });
 
-// const client = db.connect((err,res)=>{
+// db.connect((err,res)=>{
 //     if(res) console.log('Successful connection to db');
 //     if (err) console.log('Unable to connect to db',err);
 // });
@@ -97,6 +100,11 @@ const db = new pg.Pool({
 // });
 
 // db.query(logs ,(err)=>{
+//     if(!err)return console.log('successful logs Table insert');
+//     return console.log('error with logs query',err.message);
+// });
+
+// db.query(all_logs ,(err)=>{
 //     if(!err)return console.log('successful logs Table insert');
 //     return console.log('error with logs query',err.message);
 // });

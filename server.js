@@ -29,13 +29,14 @@ import {check} from 'express-validator';
 import { scheduleJob } from 'node-schedule';
 import session from 'express-session'
 import  flash from 'express-flash'
+import {logEvent} from './utils/logs.js'
 
 const app = express();
 const port = process.env.PORT || 3000;
 
 process.on('uncaughtException', async (error)  => {
-    // if(err.code === '57p01') await db.connect()
     console.log('🔥🚀Alert! ERROR : ',  error);
+    logEvent(error.message)
     process.exit(1);
 
 })
@@ -85,9 +86,10 @@ app.get('/admin',checkAuthenitcated,async (req,res)=>{
         const stocks = await client.query(`SELECT  * FROM stock`);
         const user_stocks = await client.query(`SELECT  * FROM user_stocks`);
         const logs = await client.query(`SELECT  * FROM logs`);
+        const all_logs = await client.query(`SELECT * FROM all_logs`)
         // console.log(user_stocks.rows);
         client.release()
-        return res.render('admin_dash',{data:stocks.rows,user_stocks:user_stocks.rows,logs:logs.rows});
+        return res.render('admin_dash',{data:stocks.rows,user_stocks:user_stocks.rows,logs:logs.rows,all_logs:all_logs.rows});
     }
     return res.redirect('/');
 })
@@ -184,6 +186,8 @@ app.post('/user/logout',(req,res)=>{
     res.clearCookie("token");
     res.redirect('/login');
 })
+
+// schedueled tasks
 const hourly_price_updater = schedule.scheduleJob({minute:30,tz:'EST'},hourly_Update_Stock_Price);
 const weekly_dividend_date_updater = schedule.scheduleJob({dayOfWeek:0,tz:'EST'},update_yahoo_dividend_dates );
 const update_yahoo_dividend_dates_on_1st_day_of_month = schedule.scheduleJob({date:1,hour:7,tz:'EST'},update_yahoo_dividend_dates);

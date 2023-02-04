@@ -15,11 +15,17 @@
                 <a href="/" class="home_btn"><i class="fas fa-home"></i></a>
                 <div class="log">
                     <h4>Logs</h4>
-                    <div><section>hourly_stock_price_updated:            </section>  <%= logs[0].hourly_stock_price_updated %></div>
-                    <div><section>user_entered_dividend_date_updated :   </section>  <%= logs[0].user_entered_dividend_date_updated %></div>
-                    <div><section>yahoo_dividends_earned_updated:        </section>  <%= logs[0].yahoo_dividends_earned_updated %></div>
-                    <div><section>user_entered_dividends_earned_updated :</section>  <%= logs[0].user_entered_dividends_earned_updated %></div>
-                    <div><section>monthly_update_dividend_data_updated : </section>  <%= logs[0].monthly_update_dividend_data_updated %></div>
+                    <div><section>hourly stock price update:            </section>  <%= logs[0].hourly_stock_price_updated %></div>
+                    <div><section>updating dividends earned:        </section>  <%= logs[0].yahoo_dividends_earned_updated %></div>
+                    <div><section>monthly update of dividend dates : </section>  <%= logs[0].monthly_update_dividend_data_updated %></div>
+                    
+                </div>
+                <div class="all-logs">
+                    <h4>All Logs</h4>
+                    <% all_logs.forEach(log=>{ %>
+                        <span class="event"><p>Time:<%= log.time%></p>Message: <%= log.event %></span>
+
+                    <% }) %> 
                     
                 </div>
                 <h4>Stock data from Stock Table</h4>

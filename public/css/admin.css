@@ -121,6 +121,23 @@ i{
     white-space: pre-wrap;
     word-break: break-word;
 }
+.all-logs{
+    border: 3px solid white;
+    height:20rem;
+    width: 100%;
+    color:white;
+    overflow-y: auto;
+    overflow-x: hidden;
+}
+.event{
+    display: block;
+    background: #343839;
+    padding: 0.4rem;
+    width: 100%;
+    height: max-content;
+    margin: 0.5rem 0;
+    font-size: 0.9rem;
+}
 @media (max-width:500px),(max-height:500px){
     .stocks ul, .user_stocks ul{
         transform:scale(0.7);
