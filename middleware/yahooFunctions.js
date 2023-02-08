@@ -5,7 +5,7 @@ const formatStockData = async (stock_data,stock_name)=>{
     
     let yields = stock_data.summaryDetail.dividendRate ||   
                     stock_data.summaryDetail.trailingAnnualDividendRate ||    
-                    stock_data.summaryDetail.yield *stock_data.summaryDetail.open||0;   
+                    stock_data.summaryDetail.yield *stock_data.summaryDetail.open || 0;   
     let price = stock_data.price.regularMarketPrice || stock_data.summaryDetail.open;  
     let dividendDate = (stock_data.calendarEvents && stock_data.calendarEvents.dividendDate)  
                                                     ? stock_data.calendarEvents.dividendDate.toString().substring(4,15):'';   

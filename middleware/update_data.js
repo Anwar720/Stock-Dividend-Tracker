@@ -88,7 +88,6 @@ const check_if_monthly_dividend_payer = async (stock)=>{
     if(stock !='' && data.includes(formated_stock.toUpperCase()))return true;
     return false;
 }
-
 //updates dividends recieved based on yahoo finance data
 const update_total_dividends_earned = async ()=>{
     let today = new Date().toString().slice(4,15)
@@ -100,13 +99,13 @@ const update_total_dividends_earned = async ()=>{
     update_quantity_list.rows.forEach(async (stock)=>{
         const isMonthlyPayer = await check_if_monthly_dividend_payer(stock.name);
         const rate = (isMonthlyPayer)?12:4;
-        const reinvestment_amount = stock.yield / rate;
-        const reinvestment_quantity  =  (reinvestment_amount/stock.price).toFixed(4);
+        const reinvestment_amount = parseFloat(stock.yield / rate);
+        const reinvestment_quantity  =  parseFloat((reinvestment_amount/stock.price).toFixed(3));
         client.query(`UPDATE user_stocks SET total_dividends_earned = total_dividends_earned + $1,quantity = quantity + $3,this_years_dividends = this_years_dividends + $1  WHERE name = $2 and user_id = $4`,
                     [reinvestment_amount*stock.quantity,stock.name,reinvestment_quantity,stock.user_id ],(err)=>{if(err)console.log(err.message)})
-        console.log('user:',stock.user_id, 'updating dividends earned:',stock.name,' amount:$',reinvestment_amount*stock.quantity,'total dividend recieved',stock.update_total_dividends_earned);
+        console.log('user:',stock.user_id, 'updating dividends earned:',stock.name,' amount:$',reinvestment_amount*stock.quantity,'total dividend recieved',stock.total_dividends_earned);
         //update dividends earned in the yearly records table
-        client.query(`UPDATE yearly_records SET total_dividends = total_dividends + $1 WHERE user_id = $2 and year = $3`,[reinvestment_amount*stock.quantity,stock.user_id,year])
+        // client.query(`UPDATE yearly_records SET total_dividends = total_dividends + $1 WHERE user_id = $2 and year = $3`,[reinvestment_amount*stock.quantity,stock.user_id,year])
     })
 
     //log data
@@ -134,7 +133,7 @@ const update_user_entered_total_dividends_earned = async ()=>{
         const rate = (isMonthlyPayer)?12:4;
         const reinvestment_amount = stock.yield / rate;
         const reinvestment_quantity  =  (reinvestment_amount/stock.price).toFixed(4);
-        // console.log('updating dividends earned:',stock.name,' amount per share:',reinvestment_amount, 'total reinvested:',reinvestment_amount*stock.quantity
+        //console.log('updating dividends earned:',stock.name,' amount per share:',reinvestment_amount, 'total reinvested:',reinvestment_amount*stock.quantity)
         // ,'reinvestment quantity is: ',reinvestment_quantity*stock.quantity);
         client.query(`UPDATE user_stocks SET total_dividends_earned = total_dividends_earned + $1,quantity = quantity + $3,this_years_dividends = this_years_dividends + $1  WHERE name = $2 AND user_id = $4`,[reinvestment_amount*stock.quantity,stock.name,reinvestment_quantity*stock.quantity,stock.user_id])
         
