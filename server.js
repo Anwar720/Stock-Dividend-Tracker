@@ -1,7 +1,6 @@
 import 'dotenv/config'
 import express from 'express';
 import bodyparser from 'body-parser';
-import yahooFinance from 'yahoo-finance';
 import cookieParser from 'cookie-parser';
 import {db} from './model/DBconnection.js';
 import schedule from 'node-schedule';
@@ -189,12 +188,12 @@ app.post('/user/logout',(req,res)=>{
 
 // schedueled tasks
 const hourly_price_updater = schedule.scheduleJob({minute:30,tz:'EST'},hourly_Update_Stock_Price);
-const weekly_dividend_date_updater = schedule.scheduleJob({dayOfWeek:0,tz:'EST'},update_yahoo_dividend_dates );
-const update_yahoo_dividend_dates_on_1st_day_of_month = schedule.scheduleJob({date:1,hour:7,tz:'EST'},update_yahoo_dividend_dates);
+const weekly_dividend_date_updater = schedule.scheduleJob({dayOfWeek:0,hour:7,minute:1,tz:'EST'},update_yahoo_dividend_dates );
+const update_yahoo_dividend_dates_on_1st_day_of_month = schedule.scheduleJob({date:1,hour:7,minute:1,tz:'EST'},update_yahoo_dividend_dates);
 // const user_entered_total_dividends_earned_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_user_entered_total_dividends_earned);
 const total_dividends_earned_updater = schedule.scheduleJob({hour:0,minute:1,tz:'EST'},update_total_dividends_earned);
-const updating_dividend_dates_not_in_yahoo = schedule.scheduleJob({dayOfWeek:0,hour:7,tz:'EST'},updateDividendDatesNotInYahoo);
-const MonthStartupdating_dividend_dates_not_in_yahoo = schedule.scheduleJob({date:1,hour:7,tz:'EST'},updateDividendDatesNotInYahoo);
+const updating_dividend_dates_not_in_yahoo = schedule.scheduleJob({dayOfWeek:0,hour:7,minute:1,tz:'EST'},updateDividendDatesNotInYahoo);
+const MonthStartupdating_dividend_dates_not_in_yahoo = schedule.scheduleJob({date:1,hour:7,minute:1,tz:'EST'},updateDividendDatesNotInYahoo);
 const setYearlyDividendRecords = schedule.scheduleJob({month:0,hour:0,minute:1,tz:'EST'},setYearlyRecords);
 const setMonthyDividendRecords = schedule.scheduleJob({date:25,hour:0,minute:1,tz:'EST'},setMonthlyDividendRecords);
 
