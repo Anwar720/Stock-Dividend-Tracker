@@ -1,7 +1,6 @@
 import 'dotenv/config'
 import express from 'express';
 import bodyparser from 'body-parser';
-import yahooFinance from 'yahoo-finance';
 import cookieParser from 'cookie-parser';
 import {db} from './model/DBconnection.js';
 import schedule from 'node-schedule';
